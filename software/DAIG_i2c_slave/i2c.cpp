@@ -9,8 +9,7 @@ TM1637 module(2, 3);
 static const uint I2C_SLAVE_SDA_PIN = PICO_DEFAULT_I2C_SDA_PIN; // 4
 static const uint I2C_SLAVE_SCL_PIN = PICO_DEFAULT_I2C_SCL_PIN; // 5
 
-static const byte thisAddress = 9; // these need to be swapped for the other Arduino
-static const byte otherAddress = 8;
+static const byte thisAddress = 0x30; // 
 
 static bool led_blink = false;
 

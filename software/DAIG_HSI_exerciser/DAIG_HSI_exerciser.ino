@@ -1,9 +1,7 @@
 /*
   djrm, HSI course reader with ARINC display
-  19 July 2023, arduino pico rp2040
-  two core implementation
-  ADC / display on first core
-  Encoder / ARINC on second core
+  10 August 2023, adafruit feather 2040 (master) and arduino pico rp2040 (slave)
+  two core implementation, ADC / display on first core, Encoder / ARINC on second core
 
   Sketch to test accuracy of decoded values by comparing to heading display on HSI
   Heading display has an offset of about 10 degrees for some reason 
@@ -33,22 +31,26 @@
 #include <SPI.h>
 #include <TFT_eSPI.h>         // Hardware-specific library
 #include <ADCInput.h>         // buffered ADC read stream
+#include "Synchro.h"
 #include <RotaryEncoder.h>
 #include "Arinc.h"
 #include "Compass.h"
 #include "Encoder.h"
-
 #include <Seg7.h>
-#include<Wire.h>
-#include<ADS1115_WE.h>
-
+#include <Wire.h>
+#include <ADS1115_WE.h>
 #include "PCA9685.h"
 #include "PWM.h"
 #include "Timer.h"
+#ifndef ARDUINO_ADAFRUIT_FEATHER_RP2040
+#error "application needs ARDUINO_ADAFRUIT_FEATHER_RP2040"
+// because four ADC channels are used
+#endif
+
+
 PCA9685 pwmController;
 
 #define I2C_ADDRESS 0x48
-//#define GYRO_POT_FACTOR 560 // reading is degrees / 10.0
 #define GYRO_POT_FACTOR 56.0 // reading is degrees
 #define GYRO_POT_FACTOR_PITCH GYRO_POT_FACTOR
 #define GYRO_POT_FACTOR_ROLL  GYRO_POT_FACTOR
@@ -56,12 +58,19 @@ PCA9685 pwmController;
 /* Create an instance of the library */
 ADS1115_WE adc = ADS1115_WE(I2C_ADDRESS);
 
+#if 0
+// disabled due to interaction with display, 
+// display action clobbered when Seg7 used
 Seg7 dsp( 2); // Invoke class with brightness at 2 and # of didgits at 8
+#endif
+
+#define RMS_WINDOW 200   // rms window of 40 samples, means 2 periods @50Hz
+float VoltRange = 56; 
+float maxVal = 9.85; //13.95;
+Rms readRms; // create an instance of Rms.
 
 
-
-const byte thisAddress = 8; // these need to be swapped for the other Arduino
-const byte otherAddress = 9;
+const byte otherAddress = 0x30;
 
         // data to be sent and received
 struct I2cTxStruct {
@@ -152,14 +161,16 @@ void setup(void) {
   ADCInputs.setBuffers(3, ADC_READ_BUFFERS);
   ADCInputs.begin();
 
+  // configure for automatic base-line restoration and continuous scan mode:
+  readRms.begin(VoltRange, RMS_WINDOW, ADC_12BIT, BLR_ON, CNT_SCAN);
+  readRms.start(); //start measuring
+
   targetTime = millis() + 1000; 
-///  pwm_setup();        // PWM output
   Serial.println("setup");
 
 }
 
 void setup1() {
-  // put your setup code here, to run once:
   // pins used by encoder
   Serial.println("setup1");
   pinMode(PIN_Hi_429, OUTPUT);
@@ -170,11 +181,11 @@ void setup1() {
   delay(1500);
   encoder_init(INITIAL_ENCODER_VALUE);
   compass_init();
-  draw_needle(0);
+  draw_needle(0,0);
 
   Wire.begin();
-  // SDA to GPIO 2
-  // SCL to GPIO 3
+  // n.b. SDA to GPIO 2, and SCL to GPIO 3
+
   pwmController.resetDevices();       // Resets all PCA9685 devices on i2c line
   pwmController.init();               // Initializes module using default totem-pole driver mode, and default disabled phase balancer
 
@@ -197,32 +208,17 @@ void setup1() {
   {
     Serial.println("ADS1115 not connected!");
   }
-///  interrupt_setup();  // sync input 
-//  pwm_setup();        // PWM output
-#if 0
- dsp.setchar( 'M', 0x1 );
- dsp.setchar( 'S', 0x80 );
- dsp.setchar( 'V', 0x19 );
- dsp.setchar( 'W', 0x61 );
- dsp.setchar( 'X', 0x78 );
- dsp.setchar( 'Y', 0x0D );
- dsp.setchar( 'Z', 0x43 );
- dsp.setchar( '[', 0x4E );
-
- dsp.stg( "12 34-56XYZ[", 0 );
-#endif
 }
-  int A3_Val;
 
 void loop() {
   int sinVal;
   int cosVal;
   int refVal;
+  int extVal;
 
   float r2mr1;
   float s1ms3;
   float s3ms2;
-  //float s2ms1;
 
   float sinin, cosin, delta, demod;
   int refsqwv;
@@ -232,29 +228,18 @@ void loop() {
   refVal=ADCInputs.read()-ADC_OFFSET; 
   sinVal=ADCInputs.read()-ADC_OFFSET;
   cosVal=ADCInputs.read()-ADC_OFFSET;
-  A3_Val=ADCInputs.read()-48;
+  extVal=ADCInputs.read(); // offset handled in RMS module
 
-  // note that s2ms1 isn't needed
   // convert to float in range -2PI to +2PI
-//r2mr1 =  refVal / (2048.0 / 2 * M_PI); // Vr2mr1 = -Vr1mr2 = -(Vredwht - Vblkwht)
   s1ms3 =  sinVal / (2048.0 / 2 * M_PI); // Vs1ms3 = Vylw    - Vblu
   s3ms2 =  cosVal / (2048.0 / 2 * M_PI); // Vs3ms2 = Vblu    - Vblk
-//s2ms1 =                                   Vs2ms1 = Vblk    - Vylw  
 
-#if 0
-  // convert reference waveform into square wave by getting its sign
-  if (r2mr1 < 0)
-      refsqwv = -1;
-  else if (r2mr1 >= 0)
-      refsqwv = +1;
-  else
-      refsqwv = 0;
-#else
+// note digital input could be used for phase reference if proper square wave available
+// hence saving an analogue channel
   if (refVal > 0)
       refsqwv = 1;
   else
       refsqwv = -1;
-#endif
 
 #if 0
   if(refsqwv>0)
@@ -262,6 +247,8 @@ void loop() {
   else if (refsqwv<0)
     digitalWrite(LED_BUILTIN, LOW);                                
 #endif
+
+  readRms.update(extVal, refsqwv); // for BLR_ON or for DC(+AC) signals with BLR_OFF
 
 #if 1 
   // scott t transform the synchro inputs
@@ -286,9 +273,8 @@ void loop() {
 
   // wrap from -pi to +pi
   theta = fmod((theta),(M_PI));
- // interrupt_process();
-
-//*
+ 
+/*
 // angle display update every 250mS
   if (targetTime < millis()) 
   {
@@ -354,69 +340,105 @@ void loop() {
 #endif
 
   }
-//*/
+*/
 }
 
 void loop1() {
   // put your main code here, to run repeatedly: 
   static int offset = 0;
   static int sensorValue = 2048;
-  char dispbuf[12];
+  char dspbuf[12];
   float voltage_0_1;
   float voltage_2_3;
   unsigned long data, ARINC_data;
   word label, sdi, ssm;
-  float heading;
-  encoder_pos = encoder_process();
-
+  float voltage,course,heading,compass;
   int pitch,roll;
-//  interrupt_process();
+
+  encoder_pos = encoder_process();
 
   label = 0201;   // octal message label
   sdi   = 0;      // source - destination identifiers
   ssm   = 0;      // sign status matrix
 
-  if(A3_Val < 0L)A3_Val=0L;
-  ARINC_value =  filter(A3_Val * 20);   
-
   target2_time = millis();
+
+  // update heading bug reading
+  if(target2_time % 5L == 0)
+  {
+    readRms.publish();
+    voltage = f_filter(readRms.rmsVal);
+  }
+
   if(target2_time % 250L == 0)
   {
+    // update course reading (main arrow), show in lcd
     angle = theta*180/M_PI ;
     angle = fmod(angle+180,360);
-    draw_needle(angle);   // draw meter pointer
+    course = angle;
 
-    heading = fmod((encoder_pos+360),360);
-    txData.heading  = heading;
+    // update heading setting reading (yellow bug)
+    readRms.publish();
+    voltage = f_filter(readRms.rmsVal);
+    if(voltage > maxVal) voltage = maxVal;
+    if(voltage < -maxVal) voltage = -maxVal;
+    heading = 180.0 / M_PI * asin(voltage/maxVal);
+    heading = fmod(heading+360,360);
+
+    // get compass from encoder
+    compass = fmod((encoder_pos+360),360);
+    txData.heading  = compass;
+
+    // send data to i2c bus servo transmitter
     transmitData();
 
-  if(ARINC_value>=80000L)ARINC_value=79999L;
+    // update LCD
+    draw_needle(course,heading);   // draw meter pointer
+
+    // put data on ARINC display
+    ARINC_value =  compass * 100;
+    if(ARINC_value>=80000L)ARINC_value=79999L;
     ARINC_data = ARINC429_BuildCommand(label, sdi, ARINC_value, ssm);
-//    ARINC429_PrintCommand(ARINC_data);
     ARINC429_SendCommand(ARINC_data);
 
+  // read gyro data from i2c ADC
     voltage_0_1 = readChannel(ADS1115_COMP_0_1);
     voltage_2_3 = readChannel(ADS1115_COMP_2_3);
+
 #if 0
-    sprintf(dispbuf,"%4d%4d",int(voltage_0_1*GYRO_POT_FACTOR_PITCH),int(voltage_2_3*GYRO_POT_FACTOR_ROLL));
-    dsp.stg( dispbuf );
+    sprintf(dspbuf,"%-4.0f%4.0f",heading,angle);
+    dsp.stg( dspbuf );
+
+    sprintf(dspbuf,"%4d%4d",int(voltage_0_1*GYRO_POT_FACTOR_PITCH),int(voltage_2_3*GYRO_POT_FACTOR_ROLL));
+    dsp.stg( dspbuf );
 #endif
     pitch = voltage_0_1 * GYRO_POT_FACTOR_PITCH * 10;
     roll = voltage_2_3 * GYRO_POT_FACTOR_ROLL * 10;
 
+    // send galvo data via i2c
     pwmController.setChannelPWM( 2, 2048 + (roll) ); // Set PWM (horizontal galvo)
     pwmController.setChannelPWM( 3, 2048 + (pitch));    // Set PWM (vertical galvo)
 
 #if 0
-  Serial.print("Pitch=");
-  Serial.print(voltage_0_1);
-  Serial.print(",");
-  Serial.print(pitch);
-  Serial.print(",\t Roll=");
-  Serial.print(voltage_2_3);
-  Serial.print(",");
-  Serial.println(roll);
+    Serial.print("Pitch=");
+    Serial.print(voltage_0_1);
+    Serial.print(",");
+    Serial.print(pitch);
+    Serial.print(",\t Roll=");
+    Serial.print(voltage_2_3);
+    Serial.print(",");
+    Serial.println(roll);
 #endif
+
+#if 0
+    Serial.print(compass,2);
+    Serial.print(", ");
+    Serial.print(course,2);
+    Serial.print(", ");
+    Serial.print(heading,2);
+    Serial.println();
+#endif
+
   }
 
 }

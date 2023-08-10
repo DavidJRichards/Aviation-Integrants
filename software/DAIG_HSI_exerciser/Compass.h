@@ -4,4 +4,4 @@
 
 
 extern void compass_init(void);
-extern void draw_needle(float);
+extern void draw_needle(float, float);
