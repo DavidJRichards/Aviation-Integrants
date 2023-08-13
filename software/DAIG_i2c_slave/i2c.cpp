@@ -1,40 +1,45 @@
 #include <Wire.h>
 #include <TM1637.h>
 
-extern float heading;
+extern float heading, ntos;
 extern void heading2res(float);
+extern void ntos2res(float);
+extern bool i2c_override;
 
-TM1637 module(2, 3);  
+#ifdef USE_TM1637
+TM1637 module(2, 3);
+#endif
 
-static const uint I2C_SLAVE_SDA_PIN = PICO_DEFAULT_I2C_SDA_PIN; // 4
-static const uint I2C_SLAVE_SCL_PIN = PICO_DEFAULT_I2C_SCL_PIN; // 5
+static const uint I2C_SLAVE_SDA_PIN = PICO_DEFAULT_I2C_SDA_PIN;  // 4
+static const uint I2C_SLAVE_SCL_PIN = PICO_DEFAULT_I2C_SCL_PIN;  // 5
 
-static const byte thisAddress = 0x30; // 
+static const byte thisAddress = 0x30;  //
 
 static bool led_blink = false;
 
 // data to be sent and received
 struct I2cTxStruct {
-    char textA[16];         // 16 bytes
-    int valA;               //  2
-    unsigned long valB;     //  4
-    float heading;          //  4
-    byte padding[6];        //  6
-                            //------
-                            // 32
+  char textA[16];      // 16 bytes
+  int valA;            //  2
+  unsigned long valB;  //  4
+  float heading;       //  4
+  byte padding[6];     //  6
+                       //------
+                       // 32
 };
 
 struct I2cRxStruct {
-    char textB[16];         // 16 bytes
-    int valC;               //  2
-    unsigned long valD;     //  4
-    float heading;          //  4
-    byte padding[6];        //  6
-                            //------
-                            // 32
+  char textB[16];      // 16 bytes
+  int valC;            //  2
+  unsigned long valD;  //  4
+  float heading;       //  4
+  float ntos;          //  4
+  byte padding[2];     //  2
+                       //------
+                       // 32
 };
 
-I2cTxStruct txData = {"xxx", 236, 0, 1.0};
+I2cTxStruct txData = { "xxx", 236, 0, 1.0 };
 I2cRxStruct rxData;
 
 bool newTxData = false;
@@ -43,47 +48,45 @@ bool rqSent = false;
 
 void updateDataToSend() {
 
-        // update the data after the previous message has been
-        //    sent in response to the request
-        // this ensures the new data will ready when the next request arrives
-    if (rqSent == true) {
-        rqSent = false;
+  // update the data after the previous message has been
+  //    sent in response to the request
+  // this ensures the new data will ready when the next request arrives
+  if (rqSent == true) {
+    rqSent = false;
 
-        char sText[] = "SendB";
-        strcpy(txData.textA, sText);
-        txData.valA += 10;
-        txData.heading += 0.1;
-        if (txData.valA > 300) {
-            txData.valA = 236;
-        }
-        txData.valB = millis();
-
+    char sText[] = "SendB";
+    strcpy(txData.textA, sText);
+    txData.valA += 10;
+    txData.heading += 0.1;
+    if (txData.valA > 300) {
+      txData.valA = 236;
     }
+    txData.valB = millis();
+  }
 }
 
 //=========
 
 void showTxData() {
 
-            // for demo show the data that as been sent
-        Serial.print("Sent ");
-        Serial.print(txData.textA);
-        Serial.print(' ');
-        Serial.print(txData.valA);
-        Serial.print(' ');
-        Serial.print(txData.valB);
-        Serial.print(' ');
-        Serial.println(txData.heading);
-
+  // for demo show the data that as been sent
+  Serial.print("Sent ");
+  Serial.print(txData.textA);
+  Serial.print(' ');
+  Serial.print(txData.valA);
+  Serial.print(' ');
+  Serial.print(txData.valB);
+  Serial.print(' ');
+  Serial.println(txData.heading);
 }
 
 //=============
 
 void showNewData() {
-  char text[4];
+  char text[40];
   int value;
 
-    if (newRxData == true) {
+  if (newRxData == true) {
 #if 0      
       Serial.print("This just in    ");
       Serial.print(rxData.textB);
@@ -93,65 +96,84 @@ void showNewData() {
       Serial.print(rxData.valD);
       Serial.print(' ');
       Serial.println(rxData.heading);
-#endif      
-      heading = rxData.heading;
-      heading2res(0);
-      value = 10 * rxData.heading;
-      sprintf(text, "%3u", value);
-      module.setDisplayToString(text);
-      newRxData = false;
-      led_blink = ! led_blink;
-      digitalWrite(LED_BUILTIN, led_blink);
+#endif
 
-    }
+if(!i2c_override)
+{
+    newRxData = false;
+    led_blink = !led_blink;
+    digitalWrite(LED_BUILTIN, led_blink);
+
+    heading = rxData.heading;
+    heading2res(0);
+    ntos = rxData.ntos;
+    ntos2res(0);
+
+    sprintf(text, "H=%.1f, N=%.1f", heading, ntos);
+    Serial.println(text);
+}
+else
+{
+//  Serial.print("Overriden: ");
+}
+
+#ifdef USE_TM1637
+    value = 10 * rxData.heading;
+    sprintf(text, "%3u", value);
+    module.setDisplayToString(text);
+#else
+#endif
+    //#endif
+  }
 }
 
 //============
 
-        // this function is called by the Wire library when a message is received
+// this function is called by the Wire library when a message is received
 void receiveEvent(int numBytesReceived) {
 
-    if (newRxData == false) {
-            // copy the data to rxData
-        Wire.readBytes( (byte*) &rxData, numBytesReceived);
-        newRxData = true;
+  if (newRxData == false) {
+    // copy the data to rxData
+    Wire.readBytes((byte*)&rxData, numBytesReceived);
+    newRxData = true;
+  } else {
+    // dump the data
+    while (Wire.available() > 0) {
+      byte c = Wire.read();
     }
-    else {
-            // dump the data
-        while(Wire.available() > 0) {
-            byte c = Wire.read();
-        }
-    }
+  }
 }
 
 //===========
 
 void requestEvent() {
-    Wire.write((byte*) &txData, sizeof(txData));
-    rqSent = true;
+  Wire.write((byte*)&txData, sizeof(txData));
+  rqSent = true;
 }
 
 //===========
 
-void i2c_setup(void)
-{
-    Serial.println("\nStarting I2C Slave Responder");
-    Serial.print("I2C address: ");
-    Serial.println(thisAddress);
+void i2c_setup(void) {
+  Serial.println("\nStarting I2C Slave Responder");
+  Serial.print("I2C address: ");
+  Serial.println(thisAddress);
 
-        // set up I2C
-    Wire.setSDA(I2C_SLAVE_SDA_PIN);// 0 > 4
-    Wire.setSCL(I2C_SLAVE_SCL_PIN);// 1 > 5
-    Wire.onReceive(receiveEvent); // register function to be called when a message arrives
-    Wire.onRequest(requestEvent); // register function to be called when a request arrives
-    Wire.begin(thisAddress); // join i2c bus
+  // set up I2C
+  Wire.setSDA(I2C_SLAVE_SDA_PIN);  // 0 > 4
+  Wire.setSCL(I2C_SLAVE_SCL_PIN);  // 1 > 5
+  Wire.onReceive(receiveEvent);    // register function to be called when a message arrives
+  Wire.onRequest(requestEvent);    // register function to be called when a request arrives
+  Wire.begin(thisAddress);         // join i2c bus
 
-    Serial.println("\nTM1637 7 segment heading angle display");
-    module.setupDisplay(true, 2);
-    module.setDisplayToString("dJr");
+#ifdef USE_TM1637
+  module.setupDisplay(true, 2);
+  module.setDisplayToString("dJr");
+#else
+  Serial.println("\ndisabled TM1637");
+#endif
 
-    pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, false);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, false);
 }
 
 // end

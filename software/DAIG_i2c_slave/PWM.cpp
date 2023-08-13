@@ -31,7 +31,7 @@ int amplitude_div = DIV_CONST;
 int amplitude_ref = REF_CONST;  // default reference amplitude is just 8v to limit amplifier power dissipation
 
 //uint32_t PWM_Pins[NUM_OF_PINS]     = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-uint32_t PWM_Pins[NUM_OF_PINS]     = { 8, 9 };
+uint32_t PWM_Pins[NUM_OF_PINS]     = { 8, 9, 10, 11 };
 //uint32_t PWM_Pins[NUM_OF_PINS]     = { 6, 7, 8, 9, 10, 11 };
 //#define NUM_OF_PINS       ( sizeof(PWM_Pins) / sizeof(uint32_t) )
 RP2040_PWM* PWM_Instance[NUM_OF_PINS];
@@ -55,7 +55,7 @@ transport_t transport = {
 //  "NtoS", "sin", NULL, PWM_Pins[10], 0.0, "cos", NULL, PWM_Pins[11], 0.0, 0.0, 0, 0, 0.0, 0.0,       // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
 //  "Reference", "ref+", NULL, PWM_Pins[0], 0.0, "ref-", NULL, PWM_Pins[1], 0.0, 0.0, 0, 0, 0.0, 0.0,  // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
   "Heading", "sin", NULL, PWM_Pins[0], 0.0, "cos", NULL, PWM_Pins[1], 0.0, 0.0, 0, 0, 0.0, 0.0,      // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
-//  "NtoS", "sin", NULL, PWM_Pins[4], 0.0, "cos", NULL, PWM_Pins[5], 0.0, 0.0, 0, 0, 0.0, 0.0,       // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
+  "NtoS", "sin", NULL, PWM_Pins[2], 0.0, "cos", NULL, PWM_Pins[3], 0.0, 0.0, 0, 0, 0.0, 0.0,       // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
   0L,                                                                                                // absolute
   10,                                                                                                // autostep
   false,                                                                                             // automatic
@@ -139,16 +139,16 @@ bool TimerHandler0(struct repeating_timer *t)
   // product is 20 bits - needs to be 10 - so divide by 10 bits
   dc_levels[0] = MID_POINT_INT + transport.resolvers[0].amplitude[0] * int_sine_step_value / amplitude_div;
   dc_levels[1] = MID_POINT_INT + transport.resolvers[0].amplitude[1] * int_sine_step_value / amplitude_div;
-#if 0
-  dc_levels[6] = MID_POINT_INT + transport.resolvers[3].amplitude[0] * int_sine_step_value / amplitude_ref;  // reference +sinewave output
-  dc_levels[7] = MID_POINT_INT + transport.resolvers[3].amplitude[1] * int_sine_step_value / amplitude_ref;  // reference -sinewave output
+#if 1
+  dc_levels[2] = MID_POINT_INT + transport.resolvers[1].amplitude[0] * int_sine_step_value / amplitude_ref;  // reference +sinewave output
+  dc_levels[3] = MID_POINT_INT + transport.resolvers[1].amplitude[1] * int_sine_step_value / amplitude_ref;  // reference -sinewave output
 #endif
 
   PWM_Instance[0]->setPWM_manual_Fast(PWM_Pins[0], dc_levels[0]);
   PWM_Instance[1]->setPWM_manual_Fast(PWM_Pins[1], dc_levels[1]);
-#if 0  
-  PWM_Instance[6]->setPWM_manual_Fast(PWM_Pins[6], dc_levels[6]);
-  PWM_Instance[7]->setPWM_manual_Fast(PWM_Pins[7], dc_levels[7]);
+#if 1  
+  PWM_Instance[2]->setPWM_manual_Fast(PWM_Pins[2], dc_levels[2]);
+  PWM_Instance[3]->setPWM_manual_Fast(PWM_Pins[3], dc_levels[3]);
 #endif
   //xSemaphoreTake(interruptSemaphore, portMAX_DELAY);
   //xSemaphoreTake(mutex_v, portMAX_DELAY);
@@ -219,6 +219,7 @@ void pwm_setup(void)
   pinMode(pinIpTrig, INPUT_PULLDOWN);
   build_sinetable();
   heading2res(0);
+  ntos2res(0);
 
 #if 1
   Serial.print(F("Starting 400 Hz PWM generation on "));
@@ -306,7 +307,7 @@ void heading2res(float bump) {
 #endif
 }
 
-#if 0
+#if 1
 #define NTOS_SYNCHRO
 void ntos2res(float bump) {
   float target;

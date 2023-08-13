@@ -150,7 +150,7 @@ void waitForSerial(unsigned long timeout_millis) {
       break;
   }
   delay(500);
-  Serial.println("djrm");
+  Serial.println(__FILE__);
 }
 
 void setup(void) {

@@ -11,27 +11,37 @@
  *****************************************************************************************************************************/
 
 #include <AsyncTCP_RP2040W.h>
+// credentials hidden from github
+// includes MySSID and MyPASSWORD macros
 #include "Wifi.h"
-
 #include <vector>
-
 #include <ArduinoJson.h>
+
+extern float heading,ntos;
+extern void heading2res(float);
+extern void ntos2res(float);
+extern bool i2c_override;
+
 //const size_t capacity = JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(2) + 60;
 //DynamicJsonDocument doc(capacity);
 StaticJsonDocument<200> doc;
 
 bool new_data = false;
+bool led_flash = false;
 
 #define TCP_PORT          2055
 
 static std::vector<AsyncClient*> clients; // a list to hold all clients
 
-const char* ssid = MySSID; 	//Enter SSID
-const char* pass = MyPASSWORD; 	//Enter Password
+// uses macros included from Wifi.h
+const char* ssid = MySSID; //Enter SSID
+const char* pass = MyPASSWORD; //Enter Password
 
 int status = WL_IDLE_STATUS;
 
-IPAddress serverIP;
+// static IP of this server - must add to HyperIMU application on phone
+// should to be on your local subnet
+IPAddress serverIP(192, 168, 178, 112);
 
 /* clients events */
 static void handleError(void* arg, AsyncClient* client, int8_t error)
@@ -48,6 +58,8 @@ static void handleData(void* arg, AsyncClient* client, void *data, size_t len)
 //  const size_t capacity = JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(2) + 60;
 //  DynamicJsonDocument doc(capacity);
   (void) arg;
+  // sample json string used when testing decoder
+  // note: unable to decode timestamp due to excessive size
   // char msg[256]="{\"os\":\"hyperimu\",\"Timestamp\":1691790229692,\"lsm6ds3c accelerometer\":[0.24556341767311096,-0.2919243574142456,9.816255569458008]}";
 
 #if 0
@@ -68,9 +80,15 @@ static void handleData(void* arg, AsyncClient* client, void *data, size_t len)
   Serial.println(F("\nResponse:"));
   Serial.println(doc["os"].as<const char*>());
 //  Serial.println(doc["Timestamp"].as<long>());
+#if oneplus
   Serial.println(doc["lsm6ds3c accelerometer"][0].as<float>(), 3);
   Serial.println(doc["lsm6ds3c accelerometer"][1].as<float>(), 3);
   Serial.println(doc["lsm6ds3c accelerometer"][2].as<float>(), 3);
+#else  
+  Serial.println(doc["accelerometer lsm6ds3-c"][0].as<float>(), 3);
+  Serial.println(doc["accelerometer lsm6ds3-c"][1].as<float>(), 3);
+  Serial.println(doc["accelerometer lsm6ds3-c"][2].as<float>(), 3);
+#endif  
 #endif
 
 #if 0
@@ -90,6 +108,7 @@ static void handleDisconnect(void* arg, AsyncClient* client)
   (void) arg;
 
   Serial.printf("\nClient %s disconnected\n", client->remoteIP().toString().c_str());
+  i2c_override = false;
 }
 
 static void handleTimeOut(void* arg, AsyncClient* client, uint32_t time)
@@ -116,6 +135,8 @@ static void handleNewClient(void* arg, AsyncClient* client)
   client->onError(&handleError, NULL);
   client->onDisconnect(&handleDisconnect, NULL);
   client->onTimeout(&handleTimeOut, NULL);
+  i2c_override = true;
+
 }
 
 void printWifiStatus()
@@ -130,14 +151,8 @@ void printWifiStatus()
   Serial.println(serverIP);
 }
 
-void setup()
+void json_server_setup()
 {
-  Serial.begin(115200);
-
-  while (!Serial && millis() < 5000);
-
-  delay(200);
-
   Serial.print("\nStart AsyncTCP_Server on ");
   Serial.print(BOARD_NAME);
   Serial.print(" with ");
@@ -165,11 +180,14 @@ void setup()
   // attempt to connect to WiFi network
   while ( status != WL_CONNECTED)
   {
-    delay(500);
+    led_flash = ! led_flash;
+    digitalWrite(LED_BUILTIN, led_flash);
 
+    delay(500);
+  
     // Connect to WPA/WPA2 network
     status = WiFi.status();
-  }
+}
 
   printWifiStatus();
 
@@ -186,18 +204,38 @@ void setup()
   Serial.println(TCP_PORT);
 }
 
-void loop()
+
+void json_server_loop()
 {
   if(new_data)
   {
-  Serial.print(F("Min:-10, Max:10, Roll:"));
-  Serial.print(doc["lsm6ds3c accelerometer"][0].as<float>(), 3);
-  Serial.print(F(", Pitch:"));
-  Serial.print(doc["lsm6ds3c accelerometer"][1].as<float>(), 3);
-//  Serial.print(F(", "));
-//  Serial.println(doc["lsm6ds3c accelerometer"][2].as<float>(), 3);
-  Serial.println();
-  new_data = false;
+    //#ifdef USE_PWM
+// note: sensor names seen here depend on phone    
+#ifdef oneplus    
+    heading = 9.0 * doc["lsm6ds3c accelerometer"][0].as<float>();
+    ntos = 9.0 * doc["lsm6ds3c accelerometer"][1].as<float>();
+#else
+    heading = 9.0 * doc["accelerometer lsm6ds3-c"][0].as<float>();
+    ntos = 9.0 * doc["accelerometer lsm6ds3-c"][1].as<float>();
+#endif    
+    heading2res(0);
+    ntos2res(0);
+    Serial.print(F("heading:"));
+    Serial.print(heading, 1);
+    Serial.print(F(", ntos:"));
+    Serial.println(ntos, 1);
+    //#endif
+#if 0    
+//    Serial.print(F("Min:-10, Max:10, Roll:"));
+    Serial.print(F("Roll:"));
+    Serial.print(doc["lsm6ds3c accelerometer"][0].as<float>(), 3);
+    Serial.print(F(", Pitch:"));
+    Serial.print(doc["lsm6ds3c accelerometer"][1].as<float>(), 3);
+  //  Serial.print(F(", "));
+  //  Serial.println(doc["lsm6ds3c accelerometer"][2].as<float>(), 3);
+    Serial.println();
+#endif    
+    new_data = false;
 
   }
 }

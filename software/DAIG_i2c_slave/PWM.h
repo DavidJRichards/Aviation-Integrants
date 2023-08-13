@@ -1,3 +1,5 @@
+#define USE_PWM
+
 #define TIMER_INTERRUPT_DEBUG         2
 #define _TIMERINTERRUPT_LOGLEVEL_     0 //4
 #define _PWM_LOGLEVEL_                2 //2
@@ -14,14 +16,14 @@ extern uint32_t filter(uint32_t);
 extern void syncInput(void);
 extern void interrupt_process(void);
 
-#define NUM_OF_PINS 2 //12 // two per resolver
+#define NUM_OF_PINS 4 //12 // two per resolver
 enum RESOLVERS { ABSOLUTE = -1,
                  //FINE = 0,
                  //MEDIUM,
                  //COARSE,
                  //T_REFERENCE = 0,
-                 T_HEADING };
-                 //T_NtoS };
+                 T_HEADING,
+                 T_NtoS };
 
 
 //#define DIV_CONST 740
@@ -69,7 +71,7 @@ typedef struct {
 
 typedef struct {
 //  resolver_t resolvers[6];
-  resolver_t resolvers[1];
+  resolver_t resolvers[2];
   long absolute;                // moving map absolute position
   int  autostep;                // step size for automatic (or encoder) movement
   bool  automatic;               // enable automatic map movement (E/W)

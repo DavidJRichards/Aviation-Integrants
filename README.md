@@ -6,7 +6,19 @@ Modular microprocessor circuits for exercising aviation instruments
 
 ## [Software](./software)
 
-## [Video](https://youtube.com/shorts/Rt51kpNWBBE)
+### H6 Horizon driven by Wifi HyperIMU on mobile phone
+
+[HSI Exerciser](./software/DIAG_HSI_Exerciser)
+
+[HyperIMU plotter](./software/picow_hyperimu_plotter)
+
+[Wifi server](./software/DAIG_i2c_slave)
+
+## Videos
+
+[HSI Exercisor](https://youtube.com/shorts/Rt51kpNWBBE)
+
+[H6 HyperIMU](https://youtube.com/shorts/gqmefr7U4pM)
 
 ## [Documents](./documents)
 
@@ -53,6 +65,10 @@ Measure external or internal frequency
 ### 7 segment LED displays
 
 Show measured values
+
+### pico-w json server
+
+process Wifi messages received in Json format
 
 
 
