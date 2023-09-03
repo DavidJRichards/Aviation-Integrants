@@ -6,7 +6,17 @@ Modular microprocessor circuits for exercising aviation instruments
 
 ## [Software](./software)
 
-### H6 Horizon driven by Wifi HyperIMU on mobile phone
+### Dual processor Integrated master / client system
+
+Master using ESP32 CYD tft touch display
+
+[Integrants I2C master](./software/CYD_I2C_master)
+
+Client using RP2040 PWM generators
+
+[Integrants I2C client](./software/MULTI_I2C_client)
+
+### H6 Horizon driver - initial versions
 
 [HSI Exerciser](./software/DIAG_HSI_Exerciser)
 

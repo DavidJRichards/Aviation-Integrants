@@ -1,0 +1,149 @@
+#include <Wire.h>
+#include <TM1637.h>
+#include "PWM.h"
+
+extern bool i2c_override;
+extern float gen_frequency;
+extern float syn_frequency;
+
+#ifdef USE_TM1637
+TM1637 module(2, 3);
+#endif
+
+static const uint I2C_SLAVE_SDA_PIN = 20;  //PICO_DEFAULT_I2C_SDA_PIN;  // 4
+static const uint I2C_SLAVE_SCL_PIN = 21;  //PICO_DEFAULT_I2C_SCL_PIN;  // 5
+
+static const byte thisAddress = 0x30;  //
+
+static bool led_blink = false;
+
+// data to be sent and received
+struct I2cTxStruct {
+  int status;           //  2
+  float gen_frequency;  //  4
+  float syn_frequency;  //  4
+  byte padding[22];     //  22
+                        //------
+                        // 32
+};
+
+
+struct I2cRxStruct {
+  int config;          // 2
+  float pwm_chans[6];  // 24
+  byte padding[6];     //  6
+                       //------
+                       // 32
+};
+
+I2cTxStruct txData;
+I2cRxStruct rxData;
+
+bool newTxData = false;
+bool newRxData = false;
+bool rqSent = false;
+
+void updateDataToSend() {
+
+  // update the data after the previous message has been
+  //    sent in response to the request
+  // this ensures the new data will ready when the next request arrives
+  if (rqSent == true) {
+    rqSent = false;
+
+    char sText[] = "SendB";
+    //    strcpy(txData.textA, sText);
+    txData.status += 10;
+    txData.gen_frequency = gen_frequency;
+    txData.syn_frequency = syn_frequency;
+    if (txData.status > 300) {
+      txData.status = 236;
+    }
+    //    txData.valB = millis();
+  }
+}
+
+void showNewData() {
+  static bool led_blink=false;
+  char text[40];
+  int value;
+
+  if (newRxData == true) {
+
+    led_blink = !led_blink;
+    digitalWrite(LED_BUILTIN, led_blink);
+
+    if (!i2c_override) {
+      newRxData = false;
+#if 1
+      angle2res(T_FINE, rxData.pwm_chans[0]);
+      angle2res(T_MEDIUM, rxData.pwm_chans[1]);
+      angle2res(T_COARSE, rxData.pwm_chans[2] + 120);
+#endif
+      angle2res(T_NtoS, rxData.pwm_chans[3]);
+//      angle2res(T_HEADING, rxData.pwm_chans[4]);
+
+      angle2wire(T_HEADING, 0, rxData.pwm_chans[4]);
+      angle2wire(T_HEADING, 1, rxData.pwm_chans[5]);
+
+  //    sprintf(text, "P=%.1f, R=%.1f, M=%.1f, H=%.1f, N=%.1f", chan_angle(T_FINE), chan_angle(T_MEDIUM), chan_angle(T_COARSE), chan_angle(T_HEADING), chan_angle(T_NtoS) );
+  //    Serial.println(text);
+    } else {
+      //  Serial.print("Overriden: ");
+    }
+
+    #ifdef USE_TM1637
+    value = 10 * rxData.heading;
+    sprintf(text, "%3u", value);
+    module.setDisplayToString(text);
+    #else
+    #endif
+    //#endif
+  }
+}
+
+//============
+
+// this function is called by the Wire library when a message is received
+void receiveEvent(int numBytesReceived) {
+
+  if (newRxData == false) {
+    // copy the data to rxData
+    Wire.readBytes((byte*)&rxData, numBytesReceived);
+    newRxData = true;
+  } else {
+    // dump the data
+    while (Wire.available() > 0) {
+      byte c = Wire.read();
+    }
+  }
+}
+
+//===========
+
+void requestEvent() {
+//  Serial.println("request event");
+  Wire.write((byte*)&txData, sizeof(txData));
+  rqSent = true;
+}
+
+//===========
+
+void i2c_setup(void) {
+  Serial.println("\nStarting I2C Slave Responder");
+  Serial.print("I2C address: ");
+  Serial.println(thisAddress);
+
+  // set up I2C
+  Wire.setSDA(I2C_SLAVE_SDA_PIN);  // 0 > 4
+  Wire.setSCL(I2C_SLAVE_SCL_PIN);  // 1 > 5
+  Wire.onReceive(receiveEvent);    // register function to be called when a message arrives
+  Wire.onRequest(requestEvent);    // register function to be called when a request arrives
+  Wire.begin(thisAddress);         // join i2c bus
+
+
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, false);
+}
+
+// end
