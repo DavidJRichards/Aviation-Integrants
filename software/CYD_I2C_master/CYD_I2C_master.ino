@@ -76,14 +76,22 @@ float pitch, roll, compass;
 int values[16];
 bool led_blink_green = false;
 bool led_blink_blue = false;
+
+
+typedef struct {
+  uint8_t       channel;        // 1
+  uint8_t       config;         // 1
+  uint16_t      amplitude;      // 2
+  float         value;          // 4
+} Channel_t;
+
+
+
 // data to be sent and received
 typedef struct  {
-  int config;          // 2
-  float pwm_chans[6];  // 24
-  byte padding[6];     //  6
-                       //------
-                       // 32
-} t_I2cTxStruct;
+  uint32_t config;              // 4
+  Channel_t channels[12];       // 12 * 8 = 96
+} t_I2cTxStruct;                // = 100
 
 typedef struct  {
   int status;           //  2
@@ -94,8 +102,8 @@ typedef struct  {
                         // 32
 } t_I2cRxStruct;
 const byte otherAddress = 0x30;
-t_I2cTxStruct txData;  // = {"xxx", 236, 0.0, 0.0, 0.0};
-t_I2cRxStruct rxData = { 1, 2.2, 3.3 };
+t_I2cTxStruct txData; 
+t_I2cRxStruct rxData;
 bool rqData = false;
 bool newRxData = false;
 bool newTxData = false;
@@ -183,11 +191,13 @@ void onMqttMessage(const char* topic, const uint8_t* payload, size_t len,uint8_t
   }
   else if(0==strcmp(topic,PWMdataTopic))
   {
-    txData.pwm_chans[0]=doc["angles"][0].as<float>(); 
-    txData.pwm_chans[1]=doc["angles"][1].as<float>(); 
-    txData.pwm_chans[2]=doc["angles"][2].as<float>(); 
-    txData.pwm_chans[3]=doc["angles"][3].as<float>(); 
-    txData.pwm_chans[4]=doc["angles"][4].as<float>(); 
+   
+    txData.channels[0].value=doc["angles"][0].as<float>(); 
+    txData.channels[1].value=doc["angles"][1].as<float>(); 
+    txData.channels[2].value=doc["angles"][2].as<float>(); 
+    txData.channels[3].value=doc["angles"][3].as<float>(); 
+    txData.channels[4].value=doc["angles"][4].as<float>(); 
+    txData.channels[5].value=doc["angles"][5].as<float>(); 
 
     Serial.printf("[%s] ",topic);
     Serial.printf("Angles: %d, %d, %d, %d, %d\n\r",
@@ -218,10 +228,6 @@ void onMqttMessage(const char* topic, const uint8_t* payload, size_t len,uint8_t
     compass=doc["orientation"][0].as<float>();
     pitch  =doc["orientation"][1].as<float>();
     roll   =doc["orientation"][2].as<float>();
-
-    txData.pwm_chans[0]=pitch;
-    txData.pwm_chans[1]=roll;
-    txData.pwm_chans[2]=compass; // (+120)
 
 #if 0
     Serial.printf("[%s] ",topic);
@@ -287,22 +293,36 @@ void onMqttMessage(const char* topic, const uint8_t* payload, size_t len,uint8_t
 void mqtt_publish()
 {
   char buf[256];
+
+   sprintf(buf,
+   "{\"\"CHAN0\":%6.1f, \"CHAN1\":%6.1f, \"CHAN2\":%6.1f, \"CHAN3\":%6.1f, \"CHAN4\":%6.1f, \"CHAN5\":%6.1f\
+       \"CHAN6\":%6.1f, \"CHAN7\":%6.1f, \"CHAN8\":%6.1f, \"CHAN9\":%6.1f, \"CHAN10\":%6.1f, \"CHAN11\":%6.1f}", 
+    txData.channels[0].value,
+    txData.channels[1].value,
+    txData.channels[2].value,
+    txData.channels[3].value,
+    txData.channels[4].value,
+    txData.channels[5].value,
+    txData.channels[6].value,
+    txData.channels[7].value,
+    txData.channels[8].value,
+    txData.channels[9].value,
+    txData.channels[10].value,
+    txData.channels[11].value
+    );
+
+  mqttClient.publish("integrants/pub/PWMstatus", buf, strlen(buf), 2);
+ 
   sprintf(buf, "{\"Encoder\":%d, \"ADC1\":%6.1f, \"ADC2\":%6.1f,\
-   \"Hz-gen\":%6.0f, \"Hz-syn\":%6.0f,\
-   \"CHAN0\":%6.1f, \"CHAN1\":%6.1f, \"CHAN2\":%6.1f, \"CHAN3\":%6.1f, \"CHAN4\":%6.1f}", 
+   \"Hz-gen\":%6.0f, \"Hz-syn\":%6.0f}", 
     encoder_pos,
     voltage_0_1,
     voltage_2_3,
     rxData.gen_frequency, 
-    rxData.syn_frequency==rxData.syn_frequency?rxData.syn_frequency:0.0, 
-    txData.pwm_chans[0],
-    txData.pwm_chans[1],
-    txData.pwm_chans[2],
-    txData.pwm_chans[3],
-    txData.pwm_chans[4]
+    rxData.syn_frequency==rxData.syn_frequency?rxData.syn_frequency:0.0 
     );
 
-  mqttClient.publish("integrants/pub/PWMstatus", buf, strlen(buf), 2);
+  mqttClient.publish("integrants/pub/SYSstatus", buf, strlen(buf), 2);
 
   pub_bits=myMCP.getPort(B);
   sprintf(buf, "{\"DIP1\":%d, \"DIP2\":%d, \"DIP3\":%d, \"DIP4\":%d, \"DIP5\":%d, \"DIP6\":%d, \"DIP7\":%d, \"DIP8\":%d\}",
@@ -336,6 +356,7 @@ void mqtt_publish()
 void userSetup() {
 
     Wire.begin(22,27);
+    Wire.setClock(400000);
     setupMenu();
 
   Serial.begin(115200);
@@ -410,6 +431,7 @@ float readChannel(ADS1115_MUX channel) {
 void transmitData() {
 
   {  //}    if (newTxData == true) {
+  //  Serial.printf("sizeoftx %d\n\r",sizeof(txData));
     Wire.beginTransmission(otherAddress);
     Wire.write((byte*)&txData, sizeof(txData));
     Wire.endTransmission();  // this is what actually sends the data
@@ -430,9 +452,21 @@ void requestData() {
   }
 }
 
+ enum menu_pwm_config {
+  pwm_disable,
+  pwm_synchro,
+  pwm_resolver,
+  pwm_sineCha,
+  pwm_sineChb
+ };
+
+
+
  enum menu_destination {
   Default,
   Encoder,
+  FREQ_Gen,
+  FREQ_Syn,
   ADC1,
   ADC2,
   IMU_Pitch,
@@ -491,6 +525,14 @@ float get_menuindex(int idx)
 
       case Encoder:
         value = encoder_pos;
+        break;
+
+      case FREQ_Gen:
+        value = rxData.gen_frequency;
+        break;
+
+      case FREQ_Syn:
+        value = rxData.syn_frequency;
         break;
 
       case ADC1:
@@ -674,12 +716,62 @@ void loop() {
     transmitData();
     requestData();
 
-    txData.pwm_chans[0]=get_menuindex(menuPWMChan0.getCurrentValue() );
-    txData.pwm_chans[1]=get_menuindex(menuPWMChan1.getCurrentValue() );
-    txData.pwm_chans[2]=get_menuindex(menuPWMChan2.getCurrentValue() );
-    txData.pwm_chans[3]=get_menuindex(menuPWMChan3.getCurrentValue() );
-    txData.pwm_chans[4]=get_menuindex(menuPWMChan4.getCurrentValue() );
-    
+    txData.channels[0].value=get_menuindex(menuPWMChan0.getCurrentValue() );
+    txData.channels[1].value=get_menuindex(menuPWMChan1.getCurrentValue() );
+    txData.channels[2].value=get_menuindex(menuPWMChan2.getCurrentValue() );
+    txData.channels[3].value=get_menuindex(menuPWMChan3.getCurrentValue() );
+    txData.channels[4].value=get_menuindex(menuPWMChan4.getCurrentValue() );
+    txData.channels[5].value=get_menuindex(menuPWMChan5.getCurrentValue() );
+    txData.channels[6].value=get_menuindex(menuPWMChan6.getCurrentValue() );
+    txData.channels[7].value=get_menuindex(menuPWMChan7.getCurrentValue() );
+    txData.channels[8].value=get_menuindex(menuPWMChan8.getCurrentValue() );
+    txData.channels[9].value=get_menuindex(menuPWMChan9.getCurrentValue() );
+    txData.channels[10].value=get_menuindex(menuPWMChan10.getCurrentValue() );
+    txData.channels[11].value=get_menuindex(menuPWMChan11.getCurrentValue() );
+
+    txData.channels[0].config=menuPWMConfigCH0.getCurrentValue();
+    txData.channels[1].config=menuPWMConfigCH1.getCurrentValue();
+    txData.channels[2].config=menuPWMConfigCH2.getCurrentValue();
+    txData.channels[3].config=menuPWMConfigCH3.getCurrentValue();
+    txData.channels[4].config=menuPWMConfigCH4.getCurrentValue();
+    txData.channels[5].config=menuPWMConfigCH5.getCurrentValue();
+    txData.channels[6].config=menuPWMConfigCH6.getCurrentValue();
+    txData.channels[7].config=menuPWMConfigCH7.getCurrentValue();
+    txData.channels[8].config=menuPWMConfigCH8.getCurrentValue();
+    txData.channels[9].config=menuPWMConfigCH9.getCurrentValue();
+    txData.channels[10].config=menuPWMConfigCH10.getCurrentValue();
+    txData.channels[11].config=menuPWMConfigCH11.getCurrentValue();
+      
+    txData.channels[0].channel=menuPWMChannelCH0.getCurrentValue();
+    txData.channels[1].channel=menuPWMChannelCH1.getCurrentValue();
+    txData.channels[2].channel=menuPWMChannelCH2.getCurrentValue();
+    txData.channels[3].channel=menuPWMChannelCH3.getCurrentValue();
+    txData.channels[4].channel=menuPWMChannelCH4.getCurrentValue();
+    txData.channels[5].channel=menuPWMChannelCH5.getCurrentValue();
+    txData.channels[6].channel=menuPWMChannelCH6.getCurrentValue();
+    txData.channels[7].channel=menuPWMChannelCH7.getCurrentValue();
+    txData.channels[8].channel=menuPWMChannelCH8.getCurrentValue();
+    txData.channels[9].channel=menuPWMChannelCH9.getCurrentValue();
+    txData.channels[10].channel=menuPWMChannelCH10.getCurrentValue();
+    txData.channels[11].channel=menuPWMChannelCH11.getCurrentValue();
+
+#define REF_CONST 608       // divisor for 13 volt reference output (26 v phase to phase)
+#define DIV_FACT 560        // multiplier, for menu voltage out calculation - found by experiment (needs updating)
+
+    txData.channels[0].amplitude=menuSynchroAmplitude.getCurrentValue();
+    txData.channels[1].amplitude=menuSynchroAmplitude.getCurrentValue();
+    txData.channels[2].amplitude=menuSynchroAmplitude.getCurrentValue();
+    txData.channels[3].amplitude=menuReferenceAmplitude.getCurrentValue();
+    txData.channels[4].amplitude=menuSynchroAmplitude.getCurrentValue();
+    txData.channels[5].amplitude=menuSynchroAmplitude.getCurrentValue();
+    txData.channels[6].amplitude=menuSynchroAmplitude.getCurrentValue();
+    txData.channels[7].amplitude=menuSynchroAmplitude.getCurrentValue();
+    txData.channels[8].amplitude=menuSynchroAmplitude.getCurrentValue();
+    txData.channels[9].amplitude=menuSynchroAmplitude.getCurrentValue();
+    txData.channels[10].amplitude=menuSynchroAmplitude.getCurrentValue();
+    txData.channels[11].amplitude=menuSynchroAmplitude.getCurrentValue();
+
+
     pwmController.setChannelPWM( 1, get_menuindex(menuDACGalv1.getCurrentValue() )); // galv
     pwmController.setChannelPWM( 2, get_menuindex(menuDACGalv2.getCurrentValue() ));
     pwmController.setChannelPWM( 3, get_menuindex(menuDACGalv3.getCurrentValue() ));
@@ -702,11 +794,18 @@ void loop() {
     menuFREQGen.setFloatValue(rxData.gen_frequency);
     menuFREQSyn.setFloatValue(rxData.syn_frequency==rxData.syn_frequency?rxData.syn_frequency:0.0);
     encoder_pos=menuEncoder.getCurrentValue()-2048;
-    menuPWM1.setFloatValue(txData.pwm_chans[0]);
-    menuPWM2.setFloatValue(txData.pwm_chans[1]);
-    menuPWM3.setFloatValue(txData.pwm_chans[2]);
-    menuPWM4.setFloatValue(txData.pwm_chans[3]);
-    menuPWM5.setFloatValue(txData.pwm_chans[4]);
+    menuPWM0.setFloatValue(txData.channels[0].value);
+    menuPWM1.setFloatValue(txData.channels[1].value);
+    menuPWM2.setFloatValue(txData.channels[2].value);
+    menuPWM3.setFloatValue(txData.channels[3].value);
+    menuPWM4.setFloatValue(txData.channels[4].value);
+    menuPWM5.setFloatValue(txData.channels[5].value);
+    menuPWM6.setFloatValue(txData.channels[6].value);
+    menuPWM7.setFloatValue(txData.channels[7].value);
+    menuPWM8.setFloatValue(txData.channels[8].value);
+    menuPWM9.setFloatValue(txData.channels[9].value);
+    menuPWM10.setFloatValue(txData.channels[10].value);
+    menuPWM11.setFloatValue(txData.channels[11].value);
 
   } // end if target1 time
 

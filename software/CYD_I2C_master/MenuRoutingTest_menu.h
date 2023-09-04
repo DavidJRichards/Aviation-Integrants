@@ -16,8 +16,8 @@
 #include "tcMenuTfteSpi.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
-#include <IoAbstraction.h>
 #include <IoAbstractionWire.h>
+#include <IoAbstraction.h>
 #include <EepromItemStorage.h>
 #include <EepromAbstractionWire.h>
 
@@ -31,20 +31,47 @@ extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
 
 // Any externals needed by IO expanders, EEPROMs etc
-extern IoAbstractionRef ioexp_iox;
 extern IoAbstractionRef ioexp_iox1;
+extern IoAbstractionRef ioexp_iox;
 
 // Global Menu Item exports
+extern FloatMenuItem menuPWM11;
+extern FloatMenuItem menuPWM10;
+extern FloatMenuItem menuPWM9;
+extern FloatMenuItem menuPWM8;
+extern FloatMenuItem menuPWM7;
+extern FloatMenuItem menuPWM6;
 extern FloatMenuItem menuPWM5;
 extern FloatMenuItem menuPWM4;
 extern FloatMenuItem menuPWM3;
 extern FloatMenuItem menuPWM2;
 extern FloatMenuItem menuPWM1;
+extern FloatMenuItem menuPWM0;
 extern FloatMenuItem menuFREQSyn;
 extern FloatMenuItem menuFREQGen;
-extern AnalogMenuItem menuEncoder;
 extern AnalogMenuItem menuReferenceAmplitude;
 extern AnalogMenuItem menuSynchroAmplitude;
+extern AnalogMenuItem menuPWMChannelCH11;
+extern AnalogMenuItem menuPWMChannelCH10;
+extern AnalogMenuItem menuPWMChannelCH9;
+extern AnalogMenuItem menuPWMChannelCH8;
+extern AnalogMenuItem menuPWMChannelCH7;
+extern AnalogMenuItem menuPWMChannelCH6;
+extern AnalogMenuItem menuPWMChannelCH5;
+extern AnalogMenuItem menuPWMChannelCH4;
+extern AnalogMenuItem menuPWMChannelCH3;
+extern AnalogMenuItem menuPWMChannelCH2;
+extern AnalogMenuItem menuPWMChannelCH1;
+extern AnalogMenuItem menuPWMChannelCH0;
+extern BackMenuItem menuBackSynchroChannel;
+extern SubMenuItem menuSynchroChannel;
+extern EnumMenuItem menuPWMConfigCH11;
+extern EnumMenuItem menuPWMConfigCH10;
+extern EnumMenuItem menuPWMConfigCH9;
+extern EnumMenuItem menuPWMConfigCH8;
+extern EnumMenuItem menuPWMConfigCH7;
+extern EnumMenuItem menuPWMConfigCH6;
+extern EnumMenuItem menuPWMConfigCH5;
 extern EnumMenuItem menuPWMConfigCH4;
 extern EnumMenuItem menuPWMConfigCH3;
 extern EnumMenuItem menuPWMConfigCH2;
@@ -105,6 +132,18 @@ extern EnumMenuInfo minfoDACGalv2;
 extern EnumMenuItem menuDACGalv2;
 extern EnumMenuInfo minfoDACGalv1;
 extern EnumMenuItem menuDACGalv1;
+extern EnumMenuInfo minfoPWMChan11;
+extern EnumMenuItem menuPWMChan11;
+extern EnumMenuInfo minfoPWMChan10;
+extern EnumMenuItem menuPWMChan10;
+extern EnumMenuInfo minfoPWMChan9;
+extern EnumMenuItem menuPWMChan9;
+extern EnumMenuInfo minfoPWMChan8;
+extern EnumMenuItem menuPWMChan8;
+extern EnumMenuInfo minfoPWMChan7;
+extern EnumMenuItem menuPWMChan7;
+extern EnumMenuInfo minfoPWMChan6;
+extern EnumMenuItem menuPWMChan6;
 extern EnumMenuInfo minfoPWMChan5;
 extern EnumMenuItem menuPWMChan5;
 extern EnumMenuInfo minfoPWMChan4;
@@ -119,9 +158,10 @@ extern EnumMenuInfo minfoPWMChan0;
 extern EnumMenuItem menuPWMChan0;
 extern BackMenuItem menuBackRoutingTable;
 extern SubMenuItem menuRoutingTable;
+extern AnalogMenuItem menuEncoder;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuRoutingTable; }
+inline MenuItem& rootMenuItem() { return menuEncoder; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type

@@ -32,6 +32,8 @@ enum RESOLVERS { ABSOLUTE = -1,
 #define REF_CONST 608       // divisor for 13 volt reference output (26 v phase to phase)
 #define DIV_FACT 560        // multiplier, for menu voltage out calculation - found by experiment (needs updating)
 
+extern int pwm_volts[12];
+
 #include "RPi_Pico_TimerInterrupt.h" // pwm duty cycle change timer 
 #include "RP2040_PWM.h"      // to define PWM channels
 
@@ -110,6 +112,6 @@ extern void pwm_setup(void);
 extern void abs2res(float bump);
 extern void ref2res(void);
 extern void angle2wire(int channel, int part, float angle);
-extern void angle2res(int channel, float value=NAN, float bump=0);
+extern void angle2res(int channel, byte config, float value=NAN, float bump=0);
 extern float chan_angle(int chan);
 

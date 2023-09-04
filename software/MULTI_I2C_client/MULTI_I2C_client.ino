@@ -11,6 +11,21 @@
 #include "i2c.h"
 #include "PWM.h"
 
+#define SEG7DSP
+#ifdef SEG7DSP
+/*
+	#define MAX7219_DIN	19
+	#define MAX7219_CS	13
+	#define MAX7219_CLK	18
+  */
+#include <Seg7.h>         // 8 digit 7 segment display
+#include <SPI.h>
+Seg7 dsp( 2); // Invoke class with brightness at 2 and # of didgits at 8
+char dspbuf[12];
+#endif
+float disp_lhs,disp_rhs;
+
+
 uint32_t target2_Time = 0;    // millis value for next display event
 char dashLine[] = "=====================================================================";
 bool core0ready = false;
@@ -110,6 +125,10 @@ void loop() {
   if(target2_Time < millis() )
   {
     target2_Time += 500;
+#ifdef SEG7DSP
+    sprintf(dspbuf,"%-4.0f%4.0f",disp_lhs,disp_rhs);
+    dsp.stg( dspbuf );
+#endif
  //   Serial.print(":");
   }
 }

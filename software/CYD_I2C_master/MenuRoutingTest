@@ -5,6 +5,26 @@
   "items": [
     {
       "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "2048",
+      "item": {
+        "maxValue": 4096,
+        "offset": -2048,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "Encoder",
+        "variableName": "Encoder",
+        "id": 50,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
       "type": "subMenu",
       "item": {
         "secured": false,
@@ -26,6 +46,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -86,6 +108,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -146,6 +170,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -206,6 +232,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -266,6 +294,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -326,6 +356,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -381,11 +413,385 @@
     {
       "parentId": 34,
       "type": "enumItem",
+      "defaultValue": "1",
+      "item": {
+        "enumEntries": [
+          "Default",
+          "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
+          "ADC_Value1",
+          "ADC_Value2",
+          "IMU_Pitch",
+          "IMU_Roll",
+          "IMU_Heading",
+          "DIP_SW1",
+          "DIP_SW2",
+          "DIP_SW3",
+          "DIP_SW4",
+          "DIP_SW5",
+          "DIP_SW6",
+          "DIP_SW7",
+          "DIP_SW8",
+          "MQTT_Value1",
+          "MQTT_Value2",
+          "MQTT_Value3",
+          "MQTT_Value4",
+          "MQTT_Value5",
+          "MQTT_Digit1",
+          "MQTT_Digit2",
+          "MQTT_Digit3",
+          "MQTT_Digit4",
+          "MQTT_Digit5",
+          "MQTT_Digit6",
+          "MQTT_Digit7",
+          "MQTT_Digit8",
+          "EEP_DIgit1",
+          "EEP_DIgit2",
+          "EEP_DIgit3",
+          "EEP_DIgit4",
+          "EEP_DIgit5",
+          "EEP_Value1",
+          "EEP_Value2",
+          "EEP_Value3",
+          "EEP_Value4",
+          "EEP_Value5",
+          "EEP_Angle1",
+          "EEP_Angle2",
+          "EEP_Angle3",
+          "EEP_Angle4",
+          "EEP_Angle5"
+        ],
+        "name": "PWM_Chan6",
+        "variableName": "PWMChan6",
+        "id": 88,
+        "eepromAddress": 142,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 34,
+      "type": "enumItem",
+      "defaultValue": "1",
+      "item": {
+        "enumEntries": [
+          "Default",
+          "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
+          "ADC_Value1",
+          "ADC_Value2",
+          "IMU_Pitch",
+          "IMU_Roll",
+          "IMU_Heading",
+          "DIP_SW1",
+          "DIP_SW2",
+          "DIP_SW3",
+          "DIP_SW4",
+          "DIP_SW5",
+          "DIP_SW6",
+          "DIP_SW7",
+          "DIP_SW8",
+          "MQTT_Value1",
+          "MQTT_Value2",
+          "MQTT_Value3",
+          "MQTT_Value4",
+          "MQTT_Value5",
+          "MQTT_Digit1",
+          "MQTT_Digit2",
+          "MQTT_Digit3",
+          "MQTT_Digit4",
+          "MQTT_Digit5",
+          "MQTT_Digit6",
+          "MQTT_Digit7",
+          "MQTT_Digit8",
+          "EEP_DIgit1",
+          "EEP_DIgit2",
+          "EEP_DIgit3",
+          "EEP_DIgit4",
+          "EEP_DIgit5",
+          "EEP_Value1",
+          "EEP_Value2",
+          "EEP_Value3",
+          "EEP_Value4",
+          "EEP_Value5",
+          "EEP_Angle1",
+          "EEP_Angle2",
+          "EEP_Angle3",
+          "EEP_Angle4",
+          "EEP_Angle5"
+        ],
+        "name": "PWM_Chan7",
+        "variableName": "PWMChan7",
+        "id": 89,
+        "eepromAddress": 146,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 34,
+      "type": "enumItem",
+      "defaultValue": "1",
+      "item": {
+        "enumEntries": [
+          "Default",
+          "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
+          "ADC_Value1",
+          "ADC_Value2",
+          "IMU_Pitch",
+          "IMU_Roll",
+          "IMU_Heading",
+          "DIP_SW1",
+          "DIP_SW2",
+          "DIP_SW3",
+          "DIP_SW4",
+          "DIP_SW5",
+          "DIP_SW6",
+          "DIP_SW7",
+          "DIP_SW8",
+          "MQTT_Value1",
+          "MQTT_Value2",
+          "MQTT_Value3",
+          "MQTT_Value4",
+          "MQTT_Value5",
+          "MQTT_Digit1",
+          "MQTT_Digit2",
+          "MQTT_Digit3",
+          "MQTT_Digit4",
+          "MQTT_Digit5",
+          "MQTT_Digit6",
+          "MQTT_Digit7",
+          "MQTT_Digit8",
+          "EEP_DIgit1",
+          "EEP_DIgit2",
+          "EEP_DIgit3",
+          "EEP_DIgit4",
+          "EEP_DIgit5",
+          "EEP_Value1",
+          "EEP_Value2",
+          "EEP_Value3",
+          "EEP_Value4",
+          "EEP_Value5",
+          "EEP_Angle1",
+          "EEP_Angle2",
+          "EEP_Angle3",
+          "EEP_Angle4",
+          "EEP_Angle5"
+        ],
+        "name": "PWM_Chan8",
+        "variableName": "PWMChan8",
+        "id": 90,
+        "eepromAddress": 148,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 34,
+      "type": "enumItem",
+      "defaultValue": "1",
+      "item": {
+        "enumEntries": [
+          "Default",
+          "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
+          "ADC_Value1",
+          "ADC_Value2",
+          "IMU_Pitch",
+          "IMU_Roll",
+          "IMU_Heading",
+          "DIP_SW1",
+          "DIP_SW2",
+          "DIP_SW3",
+          "DIP_SW4",
+          "DIP_SW5",
+          "DIP_SW6",
+          "DIP_SW7",
+          "DIP_SW8",
+          "MQTT_Value1",
+          "MQTT_Value2",
+          "MQTT_Value3",
+          "MQTT_Value4",
+          "MQTT_Value5",
+          "MQTT_Digit1",
+          "MQTT_Digit2",
+          "MQTT_Digit3",
+          "MQTT_Digit4",
+          "MQTT_Digit5",
+          "MQTT_Digit6",
+          "MQTT_Digit7",
+          "MQTT_Digit8",
+          "EEP_DIgit1",
+          "EEP_DIgit2",
+          "EEP_DIgit3",
+          "EEP_DIgit4",
+          "EEP_DIgit5",
+          "EEP_Value1",
+          "EEP_Value2",
+          "EEP_Value3",
+          "EEP_Value4",
+          "EEP_Value5",
+          "EEP_Angle1",
+          "EEP_Angle2",
+          "EEP_Angle3",
+          "EEP_Angle4",
+          "EEP_Angle5"
+        ],
+        "name": "PWM_Chan9",
+        "variableName": "PWMChan9",
+        "id": 91,
+        "eepromAddress": 150,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 34,
+      "type": "enumItem",
+      "defaultValue": "1",
+      "item": {
+        "enumEntries": [
+          "Default",
+          "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
+          "ADC_Value1",
+          "ADC_Value2",
+          "IMU_Pitch",
+          "IMU_Roll",
+          "IMU_Heading",
+          "DIP_SW1",
+          "DIP_SW2",
+          "DIP_SW3",
+          "DIP_SW4",
+          "DIP_SW5",
+          "DIP_SW6",
+          "DIP_SW7",
+          "DIP_SW8",
+          "MQTT_Value1",
+          "MQTT_Value2",
+          "MQTT_Value3",
+          "MQTT_Value4",
+          "MQTT_Value5",
+          "MQTT_Digit1",
+          "MQTT_Digit2",
+          "MQTT_Digit3",
+          "MQTT_Digit4",
+          "MQTT_Digit5",
+          "MQTT_Digit6",
+          "MQTT_Digit7",
+          "MQTT_Digit8",
+          "EEP_DIgit1",
+          "EEP_DIgit2",
+          "EEP_DIgit3",
+          "EEP_DIgit4",
+          "EEP_DIgit5",
+          "EEP_Value1",
+          "EEP_Value2",
+          "EEP_Value3",
+          "EEP_Value4",
+          "EEP_Value5",
+          "EEP_Angle1",
+          "EEP_Angle2",
+          "EEP_Angle3",
+          "EEP_Angle4",
+          "EEP_Angle5"
+        ],
+        "name": "PWM_Chan10",
+        "variableName": "PWMChan10",
+        "id": 92,
+        "eepromAddress": 152,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 34,
+      "type": "enumItem",
+      "defaultValue": "1",
+      "item": {
+        "enumEntries": [
+          "Default",
+          "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
+          "ADC_Value1",
+          "ADC_Value2",
+          "IMU_Pitch",
+          "IMU_Roll",
+          "IMU_Heading",
+          "DIP_SW1",
+          "DIP_SW2",
+          "DIP_SW3",
+          "DIP_SW4",
+          "DIP_SW5",
+          "DIP_SW6",
+          "DIP_SW7",
+          "DIP_SW8",
+          "MQTT_Value1",
+          "MQTT_Value2",
+          "MQTT_Value3",
+          "MQTT_Value4",
+          "MQTT_Value5",
+          "MQTT_Digit1",
+          "MQTT_Digit2",
+          "MQTT_Digit3",
+          "MQTT_Digit4",
+          "MQTT_Digit5",
+          "MQTT_Digit6",
+          "MQTT_Digit7",
+          "MQTT_Digit8",
+          "EEP_DIgit1",
+          "EEP_DIgit2",
+          "EEP_DIgit3",
+          "EEP_DIgit4",
+          "EEP_DIgit5",
+          "EEP_Value1",
+          "EEP_Value2",
+          "EEP_Value3",
+          "EEP_Value4",
+          "EEP_Value5",
+          "EEP_Angle1",
+          "EEP_Angle2",
+          "EEP_Angle3",
+          "EEP_Angle4",
+          "EEP_Angle5"
+        ],
+        "name": "PWM_Chan11",
+        "variableName": "PWMChan11",
+        "id": 93,
+        "eepromAddress": 154,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 34,
+      "type": "enumItem",
       "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -446,6 +852,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -506,6 +914,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -566,6 +976,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -626,6 +1038,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -686,6 +1100,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -746,6 +1162,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -806,6 +1224,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -866,6 +1286,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -926,6 +1348,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -986,6 +1410,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -1046,6 +1472,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -1106,6 +1534,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -1166,6 +1596,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -1226,6 +1658,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -1286,6 +1720,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -1346,6 +1782,8 @@
         "enumEntries": [
           "Default",
           "ENCODER_Pos",
+          "FERQ_Gen",
+          "FREQ_Syn",
           "ADC_Value1",
           "ADC_Value2",
           "IMU_Pitch",
@@ -1741,13 +2179,15 @@
     {
       "parentId": 57,
       "type": "enumItem",
-      "defaultValue": "0",
+      "defaultValue": "1",
       "item": {
         "enumEntries": [
+          "Disabled",
           "Synchro",
           "Resolver",
           "Sine_ChA",
-          "Sine_ChB"
+          "Sine_ChB",
+          "Reference"
         ],
         "name": "PWM_Config_CH0",
         "variableName": "PWMConfigCH0",
@@ -1762,13 +2202,15 @@
     {
       "parentId": 57,
       "type": "enumItem",
-      "defaultValue": "0",
+      "defaultValue": "1",
       "item": {
         "enumEntries": [
+          "Disabled",
           "Synchro",
           "Resolver",
           "Sine_ChA",
-          "Sine_ChB"
+          "Sine_ChB",
+          "Reference"
         ],
         "name": "PWM_Config_CH1",
         "variableName": "PWMConfigCH1",
@@ -1783,13 +2225,15 @@
     {
       "parentId": 57,
       "type": "enumItem",
-      "defaultValue": "0",
+      "defaultValue": "1",
       "item": {
         "enumEntries": [
+          "Disabled",
           "Synchro",
           "Resolver",
           "Sine_ChA",
-          "Sine_ChB"
+          "Sine_ChB",
+          "Reference"
         ],
         "name": "PWM_Config_CH2",
         "variableName": "PWMConfigCH2",
@@ -1804,13 +2248,15 @@
     {
       "parentId": 57,
       "type": "enumItem",
-      "defaultValue": "0",
+      "defaultValue": "5",
       "item": {
         "enumEntries": [
+          "Disabled",
           "Synchro",
           "Resolver",
           "Sine_ChA",
-          "Sine_ChB"
+          "Sine_ChB",
+          "Reference"
         ],
         "name": "PWM_Config_CH3",
         "variableName": "PWMConfigCH3",
@@ -1825,13 +2271,15 @@
     {
       "parentId": 57,
       "type": "enumItem",
-      "defaultValue": "0",
+      "defaultValue": "1",
       "item": {
         "enumEntries": [
+          "Disabled",
           "Synchro",
           "Resolver",
           "Sine_ChA",
-          "Sine_ChB"
+          "Sine_ChB",
+          "Reference"
         ],
         "name": "PWM_Config_CH4",
         "variableName": "PWMConfigCH4",
@@ -1845,10 +2293,426 @@
     },
     {
       "parentId": 57,
-      "type": "analogItem",
-      "defaultValue": "100",
+      "type": "enumItem",
+      "defaultValue": "1",
       "item": {
-        "maxValue": 255,
+        "enumEntries": [
+          "Disabled",
+          "Synchro",
+          "Resolver",
+          "Sine_ChA",
+          "Sine_ChB",
+          "Reference"
+        ],
+        "name": "PWM_Config_CH5",
+        "variableName": "PWMConfigCH5",
+        "id": 65,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 57,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "Disabled",
+          "Synchro",
+          "Resolver",
+          "Sine_ChA",
+          "Sine_ChB",
+          "Reference"
+        ],
+        "name": "PWM_Config_CH6",
+        "variableName": "PWMConfigCH6",
+        "id": 75,
+        "eepromAddress": 114,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 57,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "Disabled",
+          "Synchro",
+          "Resolver",
+          "Sine_ChA",
+          "Sine_ChB",
+          "Reference"
+        ],
+        "name": "PWM_Config_CH7",
+        "variableName": "PWMConfigCH7",
+        "id": 76,
+        "eepromAddress": 116,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 57,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "Disabled",
+          "Synchro",
+          "Resolver",
+          "Sine_ChA",
+          "Sine_ChB",
+          "Reference"
+        ],
+        "name": "PWM_Config_CH8",
+        "variableName": "PWMConfigCH8",
+        "id": 78,
+        "eepromAddress": 120,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 57,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "Disabled",
+          "Synchro",
+          "Resolver",
+          "Sine_ChA",
+          "Sine_ChB",
+          "Reference"
+        ],
+        "name": "PWM_Config_CH9",
+        "variableName": "PWMConfigCH9",
+        "id": 79,
+        "eepromAddress": 122,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 57,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "Disabled",
+          "Synchro",
+          "Resolver",
+          "Sine_ChA",
+          "Sine_ChB",
+          "Reference"
+        ],
+        "name": "PWM_Config_CH10",
+        "variableName": "PWMConfigCH10",
+        "id": 80,
+        "eepromAddress": 124,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 57,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "Disabled",
+          "Synchro",
+          "Resolver",
+          "Sine_ChA",
+          "Sine_ChB",
+          "Reference"
+        ],
+        "name": "PWM_Config_CH11",
+        "variableName": "PWMConfigCH11",
+        "id": 81,
+        "eepromAddress": 140,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Synchro_Channel",
+        "variableName": "SynchroChannel",
+        "id": 68,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH0",
+        "variableName": "PWMChannelCH0",
+        "id": 69,
+        "eepromAddress": 100,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "1",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH1",
+        "variableName": "PWMChannelCH1",
+        "id": 70,
+        "eepromAddress": 102,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "2",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH2",
+        "variableName": "PWMChannelCH2",
+        "id": 71,
+        "eepromAddress": 104,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "3",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH3",
+        "variableName": "PWMChannelCH3",
+        "id": 72,
+        "eepromAddress": 108,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "4",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH4",
+        "variableName": "PWMChannelCH4",
+        "id": 73,
+        "eepromAddress": 110,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "5",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH5",
+        "variableName": "PWMChannelCH5",
+        "id": 74,
+        "eepromAddress": 112,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "5",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH6",
+        "variableName": "PWMChannelCH6",
+        "id": 82,
+        "eepromAddress": 128,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "5",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH7",
+        "variableName": "PWMChannelCH7",
+        "id": 83,
+        "eepromAddress": 132,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "5",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH8",
+        "variableName": "PWMChannelCH8",
+        "id": 84,
+        "eepromAddress": 134,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "5",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH9",
+        "variableName": "PWMChannelCH9",
+        "id": 85,
+        "eepromAddress": 136,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "10",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH10",
+        "variableName": "PWMChannelCH10",
+        "id": 86,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 68,
+      "type": "analogItem",
+      "defaultValue": "11",
+      "item": {
+        "maxValue": 11,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "PWM_Channel_CH11",
+        "variableName": "PWMChannelCH11",
+        "id": 87,
+        "eepromAddress": 138,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "560",
+      "item": {
+        "maxValue": 1000,
         "offset": 0,
         "divisor": 1,
         "unitName": "Unit",
@@ -1864,11 +2728,11 @@
       }
     },
     {
-      "parentId": 57,
+      "parentId": 0,
       "type": "analogItem",
-      "defaultValue": "100",
+      "defaultValue": "608",
       "item": {
-        "maxValue": 255,
+        "maxValue": 1000,
         "offset": 0,
         "divisor": 1,
         "unitName": "Unit",
@@ -1877,26 +2741,6 @@
         "variableName": "ReferenceAmplitude",
         "id": 64,
         "eepromAddress": 94,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "analogItem",
-      "defaultValue": "2048",
-      "item": {
-        "maxValue": 4096,
-        "offset": -2048,
-        "divisor": 1,
-        "unitName": "Unit",
-        "step": 1,
-        "name": "Encoder",
-        "variableName": "Encoder",
-        "id": 50,
-        "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -1928,6 +2772,22 @@
         "name": "FREQ_Syn",
         "variableName": "FREQSyn",
         "id": 49,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "floatItem",
+      "defaultValue": "0.0",
+      "item": {
+        "numDecimalPlaces": 3,
+        "name": "PWM0",
+        "variableName": "PWM0",
+        "id": 99,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -2014,6 +2874,102 @@
         "visible": true,
         "staticDataInRAM": false
       }
+    },
+    {
+      "parentId": 0,
+      "type": "floatItem",
+      "defaultValue": "0.0",
+      "item": {
+        "numDecimalPlaces": 3,
+        "name": "PWM6",
+        "variableName": "PWM6",
+        "id": 66,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "floatItem",
+      "defaultValue": "0.0",
+      "item": {
+        "numDecimalPlaces": 3,
+        "name": "PWM7",
+        "variableName": "PWM7",
+        "id": 94,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "floatItem",
+      "defaultValue": "0.0",
+      "item": {
+        "numDecimalPlaces": 3,
+        "name": "PWM8",
+        "variableName": "PWM8",
+        "id": 95,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "floatItem",
+      "defaultValue": "0.0",
+      "item": {
+        "numDecimalPlaces": 3,
+        "name": "PWM9",
+        "variableName": "PWM9",
+        "id": 96,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "floatItem",
+      "defaultValue": "0.0",
+      "item": {
+        "numDecimalPlaces": 3,
+        "name": "PWM10",
+        "variableName": "PWM10",
+        "id": 97,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "floatItem",
+      "defaultValue": "0.0",
+      "item": {
+        "numDecimalPlaces": 3,
+        "name": "PWM11",
+        "variableName": "PWM11",
+        "id": 98,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
     }
   ],
   "codeOptions": {
@@ -2021,7 +2977,7 @@
     "lastDisplayUuid": "e6342680-6fab-4d1b-ac08-ce8dbfc0974c",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuids": [
-      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+      "46c30011-cac6-4598-a7b8-b0630d55daab"
     ],
     "lastThemeUuid": "03c6b25f-db63-402a-8447-a5ce1484c14d",
     "applicationUUID": "922e1f5d-2101-4f14-98cd-fdd77949584d",
@@ -2153,6 +3109,31 @@
         "subsystem": "INPUT"
       },
       {
+        "name": "ESPWIFI_CONCURRENT_CONNECTIONS",
+        "latestValue": "1",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT1",
+        "latestValue": "3333",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT2",
+        "latestValue": "3334",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT3",
+        "latestValue": "3335",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_BUFFERED",
+        "latestValue": "true",
+        "subsystem": "REMOTE"
+      },
+      {
         "name": "ITEM_FONT",
         "latestValue": "def:,2",
         "subsystem": "THEME"
@@ -2195,9 +3176,9 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C16",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "deviceIO:",
+      "mcp23017:iox1:32:35",
       "mcp23017:iox:32:35",
-      "mcp23017:iox1:32:35"
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

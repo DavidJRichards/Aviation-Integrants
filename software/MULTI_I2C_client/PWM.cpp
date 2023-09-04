@@ -45,6 +45,16 @@ float pitch = 0.0;
 float roll = 0.0;
 
 
+ enum menu_pwm_config {
+  pwm_disable,
+  pwm_synchro,
+  pwm_resolver,
+  pwm_sineCha,
+  pwm_sineChb,
+  pwm_reference
+ };
+
+
 #define DEFAULT_COARSE_OFFSET -0  //-90
 #define DEFAULT_MEDIUM_OFFSET 0   //65
 #define DEFAULT_FINE_OFFSET 0
@@ -59,6 +69,9 @@ int amplitude_ref = REF_CONST;  // default reference amplitude is just 8v to lim
 
 uint32_t PWM_Pins[NUM_OF_PINS]     = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 RP2040_PWM* PWM_Instance[NUM_OF_PINS];
+
+int pwm_volts[12]={DIV_FACT, DIV_FACT, DIV_FACT, REF_CONST, DIV_FACT, DIV_FACT,
+                   DIV_FACT, DIV_FACT, DIV_FACT, DIV_FACT, DIV_FACT, DIV_FACT};
 
 volatile word gen_usperiod;
 float gen_frequency = NAN;
@@ -154,6 +167,7 @@ bool TimerHandler0(struct repeating_timer *t)
   // sine_table is +- 512 ( 10 bits )
   // scale is +- 500 (10 bits )
   // product is 20 bits - needs to be 10 - so divide by 10 bits
+#if 0  
   dc_levels[0] = MID_POINT_INT + transport.resolvers[0].amplitude[0] * int_sine_step_value / amplitude_div;
   dc_levels[1] = MID_POINT_INT + transport.resolvers[0].amplitude[1] * int_sine_step_value / amplitude_div;
 
@@ -171,7 +185,25 @@ bool TimerHandler0(struct repeating_timer *t)
 
   dc_levels[10] = MID_POINT_INT + transport.resolvers[5].amplitude[0] * int_sine_step_value / amplitude_div;
   dc_levels[11] = MID_POINT_INT + transport.resolvers[5].amplitude[1] * int_sine_step_value / amplitude_div;
+#else
+  dc_levels[0] = MID_POINT_INT + transport.resolvers[0].amplitude[0] * int_sine_step_value / pwm_volts[0];
+  dc_levels[1] = MID_POINT_INT + transport.resolvers[0].amplitude[1] * int_sine_step_value / pwm_volts[0];
 
+  dc_levels[2] = MID_POINT_INT + transport.resolvers[1].amplitude[0] * int_sine_step_value / pwm_volts[1];
+  dc_levels[3] = MID_POINT_INT + transport.resolvers[1].amplitude[1] * int_sine_step_value / pwm_volts[1];
+
+  dc_levels[4] = MID_POINT_INT + transport.resolvers[2].amplitude[0] * int_sine_step_value / pwm_volts[2];
+  dc_levels[5] = MID_POINT_INT + transport.resolvers[2].amplitude[1] * int_sine_step_value / pwm_volts[2];
+
+  dc_levels[6] = MID_POINT_INT + transport.resolvers[3].amplitude[0] * int_sine_step_value / pwm_volts[3];  // reference +sinewave output
+  dc_levels[7] = MID_POINT_INT + transport.resolvers[3].amplitude[1] * int_sine_step_value / pwm_volts[3];  // reference -sinewave output
+
+  dc_levels[8] = MID_POINT_INT + transport.resolvers[4].amplitude[0] * int_sine_step_value / pwm_volts[4];
+  dc_levels[9] = MID_POINT_INT + transport.resolvers[4].amplitude[1] * int_sine_step_value / pwm_volts[4];
+
+  dc_levels[10] = MID_POINT_INT + transport.resolvers[5].amplitude[0] * int_sine_step_value / pwm_volts[5];
+  dc_levels[11] = MID_POINT_INT + transport.resolvers[5].amplitude[1] * int_sine_step_value / pwm_volts[5];
+#endif
   PWM_Instance[0]->setPWM_manual_Fast(PWM_Pins[0], dc_levels[0]);
   PWM_Instance[1]->setPWM_manual_Fast(PWM_Pins[1], dc_levels[1]);
   PWM_Instance[2]->setPWM_manual_Fast(PWM_Pins[2], dc_levels[2]);
@@ -252,13 +284,16 @@ void pwm_setup(void)
   pinMode(pinOpSync, OUTPUT);
   pinMode(pinIpTrig, INPUT_PULLDOWN);
   build_sinetable();
-  ref2res();
+//  ref2res();  // sets T_REFERENCE
 //  abs2res(0);
-  angle2res(T_FINE);
-  angle2res(T_MEDIUM);
-  angle2res(T_COARSE);
-  angle2res(T_HEADING);
-  angle2res(T_NtoS);
+  angle2res(T_FINE,pwm_synchro);
+  angle2res(T_MEDIUM,pwm_synchro);
+  angle2res(T_COARSE,pwm_synchro);
+  angle2res(T_REFERENCE,pwm_reference);
+//  angle2res(T_REFERENCE,pwm_sineCha);
+//  angle2res(T_REFERENCE,pwm_sineChb);
+  angle2res(T_HEADING,pwm_synchro);
+  angle2res(T_NtoS,pwm_synchro);
 
 #if 1
   Serial.print(F("Starting 400 Hz PWM generation on "));
@@ -309,6 +344,7 @@ void printPWMInfo(RP2040_PWM* PWM_Instance)
 //  delay(100);
 }
 
+/*
 void ref2res(void)
 {
   // reference
@@ -321,26 +357,56 @@ void angle2wire(int channel, int part, float angle) {
   target = fmod(angle, 360) * M_PI/180.0;
   transport.resolvers[channel].amplitude[part] = -sin(target) * 500;
 }
-
-void angle2res(int channel, float value/*=NAN*/, float bump/*=0*/) {
+*/
+void angle2res(int channel, byte config, float value/*=NAN*/, float bump/*=0*/) {
   float target;
-  if(value!=value)
-    value=transport.resolvers[channel].angle;
-  value = fmod(value + bump, 360);
-  transport.resolvers[channel].angle = value;
-#ifdef ANGLES_RESOLVER
-?  // output to resolver receiver
-  target = fmod(transport.resolvers[channel].angle, 360) * M_PI / 180.0;
-  transport.resolvers[channel].amplitude[0] = sin(target) * 500;
-  transport.resolvers[channel].amplitude[1] = cos(target) * 500;
-#else
-  // output to synchro receiver
-  target = fmod(transport.resolvers[channel].angle + 120, 360) * M_PI / 180.0;
-  transport.resolvers[channel].amplitude[0] = sin(target) * 500;
 
-  target = -fmod(transport.resolvers[channel].angle + 240, 360) * M_PI / 180.0;
-  transport.resolvers[channel].amplitude[1] = sin(target) * 500;
-#endif
+  switch(config){
+    case pwm_resolver:
+    // output to resolver receiver
+    if(value!=value)
+      value=transport.resolvers[channel].angle;
+    value = fmod(value + bump, 360);
+    transport.resolvers[channel].angle = value;
+    target = fmod(transport.resolvers[channel].angle, 360) * M_PI / 180.0;
+    transport.resolvers[channel].amplitude[0] = sin(target) * 500;
+    transport.resolvers[channel].amplitude[1] = cos(target) * 500;
+    break;
+
+    case pwm_synchro:
+    // output to synchro receiver
+    if(value!=value)
+      value=transport.resolvers[channel].angle;
+    value = fmod(value + bump, 360);
+    transport.resolvers[channel].angle = value;
+    target = fmod(transport.resolvers[channel].angle + 120, 360) * M_PI / 180.0;
+    transport.resolvers[channel].amplitude[0] = sin(target) * 500;
+
+    target = -fmod(transport.resolvers[channel].angle + 240, 360) * M_PI / 180.0;
+    transport.resolvers[channel].amplitude[1] = sin(target) * 500;
+    break;
+
+    case pwm_sineCha:
+    // output to first half of synchro pair
+    target = fmod(value, 360) * M_PI/180.0;
+    transport.resolvers[channel].amplitude[0] = sin(target) * 500;
+    break;
+
+    case pwm_sineChb:
+    // outout to 2nd half of synchro pair
+    target = fmod(value, 360) * M_PI/180.0;
+    transport.resolvers[channel].amplitude[1] = sin(target) * 500;
+    break;
+
+    case pwm_reference:
+    // reference
+    transport.resolvers[channel].amplitude[0] = 500.0;
+    transport.resolvers[channel].amplitude[1] = -500.0;
+    break;
+
+    default:
+    break;
+  }
 }
 
 float chan_angle(int channel)
