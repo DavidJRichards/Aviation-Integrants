@@ -47,7 +47,9 @@ Latest version of sensor and driver software integration using TcMenu
 
 ![TcMenu](../images/TcMenuExample.jpg)
 
-TcMenu remote control on PC using embedControl applicaton
+[IntegrantsMenu](./IntegrantsMenu)
+
+Menu structure tested in this project prior to copying into CYD_I2C_Master for normal use
 
 ![Alt text](../images/embedCONT.png)
 
@@ -113,6 +115,19 @@ Angle inputs (0 to 4096)
 Analogue inputs ( -180 to 180 )
 
 Digital inputs ( 0 or 1 )
+
+### JSON topics
+
+```
+integrants
+    pub
+        PWMstatus = {""CHAN0": 0.0, "CHAN1": 0.0, "CHAN2": 0.0, "CHAN3": -1.0, "CHAN4": 231.2, "CHAN5": 231.2 "CHAN6": 0.0, "CHAN7": 0.0, "CHAN8": 0.0, "CHAN9": 0.0, "CHAN10": 2.5, "CHAN11": 1.0}
+        DIPstatus = {"DIP1":0, "DIP2":1, "DIP3":1, "DIP4":0, "DIP5":1, "DIP6":1, "DIP7":1, "DIP8":0}
+        LEDstatus = {"LED1":0, "LED2":1, "LED3":1, "LED4":0, "LED5":1, "LED6":1, "LED7":1, "LED8":0}
+        SYSstatus = {"Encoder":0, "ADCAngle": 231.2, "ADC1": 2.5, "ADC2": 1.0, "Hz-gen": 403, "Hz-syn": 0}
+    sub
+        HyperIMU = {"os":"hyperimu","orientation":[94.61526489257812,-37.457916259765625,-6.3306684494018555]}
+```
 
 ### Virtual I/O
 
