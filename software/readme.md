@@ -2,6 +2,39 @@
 
 ### Dual processor Integrated master / client system
 
+#### Designed to offer flexible mapping of inputs to outputs and monitoring
+
+The configuration changes made in the editor can be saved in an eeprom for later use.
+
+Additional i/o modules can be easily be added to the system with minor changes to the master software.
+
+The main user interface is used to control of choice of outputs receiving data from an input. 
+
+Ongoing development will add function modules for more sophisticated control functions - e.g. for the moving map display module where one input will need to have calculations performed and to then drive multiple outputs. The function modules will appear in the menus in a similar way to the existing i/o devices.
+
+#### System architecture
+
+The software relies heavily on pre-built Arduino libraries, The main ones used are for the menu, wifi communications, and the i/o devices.
+
+##### Libraries used:
+
+|Function   |     |
+|-----------|-----|
+|TcMenu     ||
+|TFT_eSPI   ||
+|Wifi|  |
+|Pangolin MQTT|   |
+|ArduinoJSON ||
+|Ticker  | |
+|Wire    | |
+|MPC23017| |
+|ADS1115_WE | |
+|PCA9685 |   |
+|SPI     |   |
+|Seg7    |   |
+|TM1637  |   |
+|ADCInput|   |
+
 Master using ESP32 CYD tft touch display
 
 [Integrants I2C master](./CYD_I2C_master)
@@ -27,6 +60,8 @@ PWM outputs are low voltage AC outputs which are fed into an array of audio ampl
 An optional 115 Volt 400 Hz input is used to generate a synchronizing signal to the system synchro outputs. 
 
 Operation without synchronising input is possible if the built-in reference generator is used and its output fed to the target system.
+
+Three ADC channels on the RP2040 are used to measure the angle of an attached Synchro transmitter.
 
 All system values are visible on the TFT menu display, the information is also transmitted as MQTT data and can de displayed on a PC using, for example, using Node Red dashboard or MQTT explorer.
 
@@ -115,17 +150,18 @@ Each channel is configured using one of 12 parameter sets, giving access to:
 
 ## Input sources
 
-|Source |                   |
-|-------|-------------------|
-|Default|                   |
-|ENCODER_Pos|               |
-|FERQ_Gen|Internal frequency|
-|FREQ_Syn|External frequency|
-|ADC_Value1|Horizon Pitch   |
-|ADC_Value2|Horizon Roll    |
-|IMU_Pitch|HyperIMU         |
-|IMU_Roll|HyperIMU          |
-|IMU_Heading|HyperIMU       |
+|Source |                    |
+|-------|--------------------|
+|Default|                    |
+|ENCODER_Pos|                |
+|FERQ_Gen|Internal frequency |
+|FREQ_Syn|External frequency |
+|ADC_Value1|Horizon Pitch    |
+|ADC_Value2|Horizon Roll     |
+|IMU_Pitch|HyperIMU          |
+|IMU_Roll|HyperIMU           |
+|IMU_Heading|HyperIMU        |
+|ADC_Angle  |Synchro receiver|
 |DIP_SW1||
 |DIP_SW2||
 |DIP_SW3||
@@ -134,34 +170,34 @@ Each channel is configured using one of 12 parameter sets, giving access to:
 |DIP_SW6||
 |DIP_SW7||
 |DIP_SW8||
-|MQTT_Value1|0 to 4096      |
-|MQTT_Value2|               |
-|MQTT_Value3|               |
-|MQTT_Value4|               |
-|MQTT_Value5|               |
-|MQTT_Digit1|0 to 1         |
-|MQTT_Digit2|               |
-|MQTT_Digit3|               |
-|MQTT_Digit4|               |
-|MQTT_Digit5|               |
-|MQTT_Digit6|               |
-|MQTT_Digit7|               |
-|MQTT_Digit8|               |
-|EEP_Digit1|0 to 1 (0)      |
-|EEP_Digit2|                |
-|EEP_Digit3|                |
-|EEP_Digit4|                |
-|EEP_Digit5|                |
-|EEP_Value1|0 to 4096 (2048)|
-|EEP_Value2|                |
-|EEP_Value3|                |
-|EEP_Value4|                |
-|EEP_Value5|                |
-|EEP_Angle1|-180 to 180 (0) |
-|EEP_Angle2|                |
-|EEP_Angle3|                |
-|EEP_Angle4|                |
-|EEP_Angle5|                |
+|MQTT_Value1|0 to 4096       |
+|MQTT_Value2|                |
+|MQTT_Value3|                |
+|MQTT_Value4|                |
+|MQTT_Value5|                |
+|MQTT_Digit1|0 to 1          |
+|MQTT_Digit2|                |
+|MQTT_Digit3|                |
+|MQTT_Digit4|                |
+|MQTT_Digit5|                |
+|MQTT_Digit6|                |
+|MQTT_Digit7|                |
+|MQTT_Digit8|                |
+|EEP_Digit1|0 to 1 (0)       |
+|EEP_Digit2|                 |
+|EEP_Digit3|                 |
+|EEP_Digit4|                 |
+|EEP_Digit5|                 |
+|EEP_Value1|0 to 4096 (2048) |
+|EEP_Value2|                 |
+|EEP_Value3|                 |
+|EEP_Value4|                 |
+|EEP_Value5|                 |
+|EEP_Angle1|-180 to 180 (0)  |
+|EEP_Angle2|                 |
+|EEP_Angle3|                 |
+|EEP_Angle4|                 |
+|EEP_Angle5|                 |
  
 ## Output sinks
 

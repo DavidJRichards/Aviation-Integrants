@@ -4,7 +4,7 @@ Modular microprocessor circuits for exercising aviation instruments
 
 ## [Photos](./images)
 
-## [Software](./software)
+## [Interants Software](./software)
 
 ### Dual processor Integrated master / client system
 
