@@ -16,8 +16,10 @@
 #include "tcMenuTfteSpi.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
-#include <IoAbstractionWire.h>
+#include <RuntimeMenuItem.h>
+#include <EditableLargeNumberMenuItem.h>
 #include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
 #include <EepromItemStorage.h>
 #include <EepromAbstractionWire.h>
 
@@ -31,8 +33,8 @@ extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
 
 // Any externals needed by IO expanders, EEPROMs etc
-extern IoAbstractionRef ioexp_iox1;
 extern IoAbstractionRef ioexp_iox;
+extern IoAbstractionRef ioexp_iox1;
 
 // Global Menu Item exports
 extern FloatMenuItem menuPWM11;
@@ -100,6 +102,14 @@ extern ActionMenuItem menuEepromLoad;
 extern ActionMenuItem menuEepromSave;
 extern BackMenuItem menuBackEEPROMData;
 extern SubMenuItem menuEEPROMData;
+extern EnumMenuInfo minfoDACDC3;
+extern EnumMenuItem menuDACDC3;
+extern EnumMenuInfo minfoDACDC2;
+extern EnumMenuItem menuDACDC2;
+extern EnumMenuInfo minfoDACDC1;
+extern EnumMenuItem menuDACDC1;
+extern EnumMenuInfo minfoDACAMP;
+extern EnumMenuItem menuDACAMP;
 extern EnumMenuInfo minfoLED8;
 extern EnumMenuItem menuLED8;
 extern EnumMenuInfo minfoLED7;
@@ -161,6 +171,10 @@ extern EnumMenuItem menuPWMChan0;
 extern BackMenuItem menuBackRoutingTable;
 extern SubMenuItem menuRoutingTable;
 extern FloatMenuItem menuSynchroAngle;
+extern FloatMenuItem menuMapCoarse;
+extern FloatMenuItem menuMapMedium;
+extern FloatMenuItem menuMapFine;
+extern EditableLargeNumberMenuItem menuMapAbsolute;
 extern AnalogMenuItem menuEncoder;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
@@ -170,6 +184,8 @@ void setupMenu();
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
+void CALLBACK_FUNCTION cb_absolute(int id);
+void CALLBACK_FUNCTION cb_encoder(int id);
 void CALLBACK_FUNCTION eeprom_load(int id);
 void CALLBACK_FUNCTION eeprom_save(int id);
 

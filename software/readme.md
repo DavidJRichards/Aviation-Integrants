@@ -12,6 +12,10 @@ The main user interface is used to control of choice of outputs receiving data f
 
 Ongoing development will add function modules for more sophisticated control functions - e.g. for the moving map display module where one input will need to have calculations performed and to then drive multiple outputs. The function modules will appear in the menus in a similar way to the existing i/o devices.
 
+#### Moving map
+
+Menu and MQTT inputs are available to set the position of the moving map display, the horizontal movement needs to be sent to the map unit as three resolver values, these are calculated from the absolute map position variable.
+
 #### System architecture
 
 The software relies heavily on pre-built Arduino libraries, The main ones used are for the menu, wifi communications, and the i/o devices.
@@ -20,20 +24,21 @@ The software relies heavily on pre-built Arduino libraries, The main ones used a
 
 |Function   |     |
 |-----------|-----|
-|TcMenu     ||
-|TFT_eSPI   ||
-|Wifi|  |
+|TcMenu     |     |
+|TFT_eSPI   |     |
+|Wifi       |     |
 |Pangolin MQTT|   |
-|ArduinoJSON ||
-|Ticker  | |
-|Wire    | |
-|MPC23017| |
-|ADS1115_WE | |
-|PCA9685 |   |
-|SPI     |   |
-|Seg7    |   |
-|TM1637  |   |
-|ADCInput|   |
+|ArduinoJSON |    |
+|Ticker      |   |
+|Wire        |   |
+|MPC23017    |   |
+|ADS1115_WE  |   |
+|PCA9685     |   |
+|SPI         |   |
+|Seg7        |   |
+|TM1637      |   |
+|ADCInput    |   |
+|Arinc429    |   |
 
 Master using ESP32 CYD tft touch display
 
@@ -80,15 +85,17 @@ The configuration menu is editable using the system rotary encoder, the menu pro
 
 8 Digit 7 Segment display
 
+Single Arinc429 transmitter
+
 ### Inputs
 
 Rotary encoder manual
 
+Synchro Receiver ADC with angle decode
+
 28V 400Hz synchronizing input
 
-ADC for horizon gyro
-
-ADC for synchro reading
+ADC for horizon gyro angle voltage
 
 8 DIP switches
 
@@ -106,9 +113,13 @@ DIP switch status
 
 LED status
 
+Moving Map status
+
 #### Subscribed
 
 HyperIMU phone position sensor
+
+MovingMap Absolute value & Fine, Medium, Coarse angles
 
 Angle inputs (0 to 4096)
 
@@ -117,6 +128,8 @@ Analogue inputs ( -180 to 180 )
 Digital inputs ( 0 or 1 )
 
 ### JSON topics
+
+Sample MQTT messages in JSON format
 
 ```
 integrants
@@ -140,6 +153,10 @@ Angle inputs
 Value inputs
 
 Digital inputs
+
+Encoder position
+
+Absolute map position
 
 
 ## PWM Configuration
@@ -213,6 +230,11 @@ Each channel is configured using one of 12 parameter sets, giving access to:
 |EEP_Angle3|                 |
 |EEP_Angle4|                 |
 |EEP_Angle5|                 |
+|MAP Absolute|value input         |
+|MAP Fine    |Calculated from abs.|
+|MAP Medium  |Calculated from abs.|
+|MAP Coarse  |Calculated from abs.|
+
  
 ## Output sinks
 
@@ -227,9 +249,9 @@ Each channel is configured using one of 12 parameter sets, giving access to:
 |PWM6 Chan    |spare          |
 |PWM7 Chan    |spare          |
 |PWM8 Chan    |spare          |
-|PWM9 Chan    |spare          |
-|PWM10 Chan   |also 7 Seg A   |
-|PWM11 Chan   |also 7 Seg B   |
+|PWM9 Chan    |also ARINC data|
+|PWM10 Chan   |also 7 Seg LHS |
+|PWM11 Chan   |also 7 Seg RHS |
 |DAC Galv1    |250 uA Analogue|
 |DAC Galv2    |250 uA Analogue|
 |DAC Galv3    |250 uA Analogue|
@@ -239,6 +261,10 @@ Each channel is configured using one of 12 parameter sets, giving access to:
 |DAC Lamp     |28 V PWM       |
 |DAC Solenoid1|28 V Switch    |
 |DAC Solenoid2|28 V Switch    |
+|DAC DC1      |28 V PWM       |
+|DAC DC2      |28 V PWM       |
+|DAC DC3      |28 V PWM       |
+|DAC Amp      |28 V on/off    |
 |LED1         |               |
 |LED2         |               |
 |LED3         |               |
