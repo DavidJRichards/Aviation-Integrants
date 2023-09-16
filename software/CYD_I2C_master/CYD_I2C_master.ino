@@ -453,9 +453,9 @@ void userSetup() {
   pwmController.setChannelPWM(9, 4095);   // Set PWM to full on  (28 volt hi side driver to solenoid)
   pwmController.setChannelPWM(10, 4095);  // Set PWM to full on  (28 volt hi side driver to solenoid)
 // ch11 unused
-  pwmController.setChannelPWM(12, 4095);   // Set PWM to full on  (28 volt hi side driver to DC1)
-  pwmController.setChannelPWM(13, 4095);   // Set PWM to full on  (28 volt hi side driver to DC2)
-  pwmController.setChannelPWM(14, 4095);   // Set PWM to full on  (28 volt hi side driver to DC3)
+  pwmController.setChannelPWM(12, 0);   // Set PWM to full on  (28 volt hi side driver to DC1)
+  pwmController.setChannelPWM(13, 0);   // Set PWM to full on  (28 volt hi side driver to DC2)
+  pwmController.setChannelPWM(14, 0);   // Set PWM to full on  (28 volt hi side driver to DC3)
   pwmController.setChannelPWM(15, 0   );   // Set PWM to off      (28 volt hi side driver to Amp Mains relay)
 // ch15  
 #endif
@@ -869,9 +869,9 @@ void loop() {
     pwmController.setChannelPWM( 9, get_menuindex(menuDACSolenoid1.getCurrentValue() )>0?4095:0); // solenoid
     pwmController.setChannelPWM(10, get_menuindex(menuDACSolenoid2.getCurrentValue() )>0?4095:0);
 
-    pwmController.setChannelPWM(12, get_menuindex(menuDACDC1.getCurrentValue() ));
-    pwmController.setChannelPWM(13, get_menuindex(menuDACDC2.getCurrentValue() ));
-    pwmController.setChannelPWM(14, get_menuindex(menuDACDC3.getCurrentValue() ));
+    pwmController.setChannelPWM(12, get_menuindex(menuDACDC1.getCurrentValue() )>0?4095:0);
+    pwmController.setChannelPWM(13, get_menuindex(menuDACDC2.getCurrentValue() )>0?4095:0);
+    pwmController.setChannelPWM(14, get_menuindex(menuDACDC3.getCurrentValue() )>0?4095:0);
     pwmController.setChannelPWM(15, get_menuindex(menuDACAMP.getCurrentValue() )>0?4095:0);
 
     myMCP.setPin(7, A, get_menuindex(menuLED1.getCurrentValue() ));

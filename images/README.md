@@ -33,6 +33,11 @@ IMG_20230807_195858.jpg
 </td>
 
 <td valign="bottom">
+<img src="./MQTT_NodeRed.png" width="200"><br>
+MQTT_NodeRed.png
+</td>
+
+<td valign="bottom">
 <img src="./TcMenuExample.jpg" width="200"><br>
 TcMenuExample.jpg
 </td>

@@ -8,7 +8,11 @@ The configuration changes made in the editor can be saved in an eeprom for later
 
 Additional i/o modules can be easily be added to the system with minor changes to the master software.
 
-The main user interface is used to control of choice of outputs receiving data from an input. 
+The configuration implements a cross-point matrix of inputs connected to outputs, with a storage cell to configure each crossing.
+
+The main user interface is used to control of choice of outputs receiving data from an input. A menu 'Routing Table' consists of a list of each output and choice is made as to which input it uses. A single input can feed more than one output if neded. 
+
+For the synchro simulation channels there is an additional configuration to select the transformation used, synchro, resolver, single sin(0), etc. The values are all normalised into floating point anthough some kinds are integer or even boolean.
 
 Ongoing development will add function modules for more sophisticated control functions - e.g. for the moving map display module where one input will need to have calculations performed and to then drive multiple outputs. The function modules will appear in the menus in a similar way to the existing i/o devices.
 
@@ -57,6 +61,10 @@ Latest version of sensor and driver software integration using TcMenu
 Menu structure tested in this project prior to copying into CYD_I2C_Master for normal use
 
 ![Alt text](../images/embedCONT.png)
+
+MQTT allows remote control and monitor of system, example shown here has IMU and moving map values:
+
+![NodeRed](../images/MQTT_NodeRed.png)
 
 ## Physical
 
@@ -273,4 +281,39 @@ Each channel is configured using one of 12 parameter sets, giving access to:
 |LED6         |               |
 |LED7         |               |
 |LED8         |               |
+
+## Special functions
+
+### System frequency, FREQ_SYN, FREQ_SYN
+
+ * Frequency of sampled waveform
+ * Frequency of synchro simulation
+
+The frequency to be sampled is processed and opto-coupled before use as edge triggered interrupt input.
+The sampled frequency is also output as a pulse on a spare micro pin for scope sync use.
+
+Synchro simulation frequency is locked to sampled input frequency when it is present
+
+### Synchro angle read, ADC_Angle
+
+Three wires fed into two ASC inputs to read position angle 0 to 360 degrees
+
+### IMU_Pitch, IMU_Roll, IMU_Heading
+
+Values received using MQTT from HyperIMU orientation protocol running on mobile phone
+
+### Moving map horizontal position calculations
+
+Absolute position converted into three seperate resolver angles 
+
+#### MAP_FIne, MAP_Medium, MAP_Coarse
+
+ *    absolute=menuMapAbsolute.getLargeNumber()->getAsFloat();
+ *   menuMapFine.setFloatValue  (fmod((absolute         ) +   fine_offset, 360)); // fine
+ *   menuMapMedium.setFloatValue(fmod((absolute / ratio1) + medium_offset, 360)); // medium
+ *   menuMapCoarse.setFloatValue(fmod((absolute / ratio2) + coarse_offset, 360)); // coarse
+
+
+
+
 
