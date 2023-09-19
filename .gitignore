@@ -1,8 +1,13 @@
 # Hidden 
 *Wifi.h*
 *defines.h*
-*DAIG*
-*DAIG*.*
+#*DAIG*
+#*DAIG*.*
+*.backup
+*backup*
+#*CYD_Pangolin_TCMenu_master*
+#*CYD_PangolinMQTT_I2C*
+*DIAG_HSI_exerciser*
 
 # Prerequisites
 *.d
