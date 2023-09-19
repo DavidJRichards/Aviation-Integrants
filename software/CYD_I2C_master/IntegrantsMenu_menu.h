@@ -18,8 +18,8 @@
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
-#include <IoAbstraction.h>
 #include <IoAbstractionWire.h>
+#include <IoAbstraction.h>
 #include <EepromItemStorage.h>
 #include <EepromAbstractionWire.h>
 
@@ -37,6 +37,8 @@ extern IoAbstractionRef ioexp_iox;
 extern IoAbstractionRef ioexp_iox1;
 
 // Global Menu Item exports
+extern AnalogMenuItem menuPhaseOffset;
+extern AnalogMenuItem menuRmsNominal;
 extern FloatMenuItem menuPWM11;
 extern FloatMenuItem menuPWM10;
 extern FloatMenuItem menuPWM9;
@@ -144,8 +146,8 @@ extern EnumMenuInfo minfoDACGalv2;
 extern EnumMenuItem menuDACGalv2;
 extern EnumMenuInfo minfoDACGalv1;
 extern EnumMenuItem menuDACGalv1;
-extern EnumMenuInfo minfoMAPAbsoluteSet;
-extern EnumMenuItem menuMAPAbsoluteSet;
+extern EnumMenuInfo minfoMapAbsoluteSet;
+extern EnumMenuItem menuMapAbsoluteSet;
 extern EnumMenuInfo minfoPWMChan11;
 extern EnumMenuItem menuPWMChan11;
 extern EnumMenuInfo minfoPWMChan10;
@@ -172,6 +174,9 @@ extern EnumMenuInfo minfoPWMChan0;
 extern EnumMenuItem menuPWMChan0;
 extern BackMenuItem menuBackRoutingTable;
 extern SubMenuItem menuRoutingTable;
+extern FloatMenuItem menuCalRatio2;
+extern EditableLargeNumberMenuItem menuMapRatio1;
+extern EditableLargeNumberMenuItem menuMapRatio0;
 extern FloatMenuItem menuSynchroAngle;
 extern FloatMenuItem menuMapCoarse;
 extern FloatMenuItem menuMapMedium;
@@ -188,6 +193,9 @@ void setupMenu();
 
 void CALLBACK_FUNCTION cb_absolute(int id);
 void CALLBACK_FUNCTION cb_encoder(int id);
+void CALLBACK_FUNCTION cb_phase(int id);
+void CALLBACK_FUNCTION cb_ratio(int id);
+void CALLBACK_FUNCTION cb_voltage(int id);
 void CALLBACK_FUNCTION eeprom_load(int id);
 void CALLBACK_FUNCTION eeprom_save(int id);
 

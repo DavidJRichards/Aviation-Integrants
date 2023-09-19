@@ -112,3 +112,30 @@ void CALLBACK_FUNCTION cb_absolute(int id) {
     menuMapMedium.setFloatValue(fmod((absolute / ratio1) + medium_offset, 360)); // medium
     menuMapCoarse.setFloatValue(fmod((absolute / ratio2) + coarse_offset, 360)); // coarse
 }
+
+//#define AMPLITUDE_FS 14.23
+//#define DIV_FACT 560
+
+//float div_fact, amplitude_nom;
+
+void CALLBACK_FUNCTION cb_voltage(int id) {
+    // TODO - your menu change code
+  //div_fact = menuRmsFactor.getCurrentValue();
+  //amplitude_nom = menuRmsNominal.getCurrentValue();
+  float value = menuRmsNominal.getCurrentValue() * 100.0 / menuReferenceAmplitude.getCurrentValue();
+}
+
+
+
+void CALLBACK_FUNCTION cb_ratio(int id) {
+    // TODO - your menu change code
+    double ratio2;
+    ratio2 = menuMapRatio0.getLargeNumber()->getAsFloat() * menuMapRatio1.getLargeNumber()->getAsFloat();
+    menuCalRatio2.setFloatValue(ratio2);
+}
+
+
+
+void CALLBACK_FUNCTION cb_phase(int id) {
+    // TODO - your menu change code
+}

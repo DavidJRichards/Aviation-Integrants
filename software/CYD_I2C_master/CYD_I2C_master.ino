@@ -87,24 +87,18 @@ bool led_blink_green = false;
 bool led_blink_blue = false;
 
 
-#define DEFAULT_COARSE_OFFSET -0  //-90
-#define DEFAULT_MEDIUM_OFFSET 0   //65
+#define DEFAULT_COARSE_OFFSET 0
+#define DEFAULT_MEDIUM_OFFSET 0
 #define DEFAULT_FINE_OFFSET 0
 
 int coarse_offset = DEFAULT_COARSE_OFFSET;  // film at left hand end of roll, abs 0
 int medium_offset = DEFAULT_MEDIUM_OFFSET;  //
 int fine_offset = DEFAULT_FINE_OFFSET;
-double absolute;
-//LargeFixedNumber* large_absolute;
 
-// these constants represent the gearing between the resolvers
-const float ratio0 = (32.2727272727 / 1.00979);              // medium to coarse
-const float ratio2 = (1041.5289256198 / 1.00979 / 1.00333);  //ratio1*30; // fine to coarse
-const float ratio1 = (ratio2 / ratio0);                      //30;        // fine to medium
+double absolute, ratio0, ratio1, ratio2;
+void abs2res(double);
 
-
-
-
+// single PWM channel config
 typedef struct {
   uint8_t       channel;        // 1
   uint8_t       config;         // 1
@@ -112,22 +106,24 @@ typedef struct {
   float         value;          // 4
 } Channel_t;
 
-
-
-// data to be sent and received
+// data to send to client using I2C 
 typedef struct  {
   uint32_t config;              // 4
   Channel_t channels[12];       // 12 * 8 = 96
-} t_I2cTxStruct;                // = 100
+  uint16_t  phase_offset;       // 2
+} t_I2cTxStruct;                // = 102
 
+// data to receive from client using I2C
 typedef struct  {
   uint32_t status;      //  4
   float gen_frequency;  //  4
   float syn_frequency;  //  4
-  float adc_angle;       //  4
+  float adc_angle;      //  4
                         //------
-                        // 
+                        // 16
 } t_I2cRxStruct;
+
+// client I2C address
 const byte otherAddress = 0x30;
 t_I2cTxStruct txData; 
 t_I2cRxStruct rxData;
@@ -160,31 +156,19 @@ void onMqttConnect(bool sessionPresent) {
   Serial.println("Subscribing at QoS 2");
   mqttClient.subscribe(DigitalTopic, 2);
 
-//  Serial.println("Subscribing at QoS 2");
-//  mqttClient.subscribe(StatusTopic, 2);
-
-//  Serial.printf("T=%u Publishing at QoS 0\n",millis());
-//  mqttClient.publish("integrants/pub/test1",pload0,strlen(pload0));
-//  Serial.printf("T=%u Publishing at QoS 1\n",millis());
-//  mqttClient.publish("integrants/pub/test2",pload1,strlen(pload1),1); 
-//  Serial.printf("T=%u Publishing at QoS 2\n",millis());
-//  mqttClient.publish("integrants/pub/test3",pload2,strlen(pload2),2);
-
-  PT1.attach(1,[]{
-    // simple way to publish int types  as strings using printf format
-//    mqttClient.publish("integrants/pub/test4",ESP.getFreeHeap(),"%u"); 
-//    mqttClient.publish("integrants/pub/test4",-33); 
+// use timer to schedule regular mqtt message publishing
+  PT1.attach(1,[] // 1 second rate
+  {
     mqtt_publish();
   });
 }
+
+//=============================================================================
 
 void onMqttMessage(const char* topic, const uint8_t* payload, size_t len,uint8_t qos,bool retain,bool dup) {
   char message[len + 1];
   std::string t(topic);
   std::string sub = t.substr(t.find("/")+1);
-//  Serial.printf("\nH=%u Message %s qos%d dup=%d retain=%d len=%d\n",ESP.getFreeHeap(),topic,qos,dup,retain,len);
-//  PANGO::dumphex(payload,len,16);
-//  Serial.printf("Unpack %s ",sub.c_str());
 
   DeserializationError error = deserializeJson(doc, payload);
   if (error) {
@@ -274,8 +258,11 @@ void onMqttMessage(const char* topic, const uint8_t* payload, size_t len,uint8_t
   {
     if(doc.containsKey("Absolute"))
     {
-      menuMapAbsolute.getLargeNumber()->setFromFloat(doc["Absolute"].as<float>());
-     cb_absolute(0);
+      absolute = doc["Absolute"].as<float>();
+      menuMapAbsolute.getLargeNumber()->setFromFloat(absolute);
+      abs2res(absolute);
+//      menuMapAbsolute.getLargeNumber()->setFromFloat(doc["Absolute"].as<float>());
+//      cb_absolute(0);
     }
     if(doc.containsKey("Fine"))
       menuMapFine.setFloatValue(doc["Fine"].as<float>());    
@@ -327,7 +314,7 @@ void onMqttMessage(const char* topic, const uint8_t* payload, size_t len,uint8_t
   }
   else
   {
-  //  Serial.printf("\nH=%u Message %s qos%d dup=%d retain=%d len=%d\n",ESP.getFreeHeap(),topic,qos,dup,retain,len);
+    Serial.printf("\nH=%u Message %s qos%d dup=%d retain=%d len=%d\n",ESP.getFreeHeap(),topic,qos,dup,retain,len);
     PANGO::dumphex(payload,len,16);
     Serial.printf("Unpack %s ",sub.c_str());
 
@@ -335,13 +322,15 @@ void onMqttMessage(const char* topic, const uint8_t* payload, size_t len,uint8_t
 
 } 
 
+//=============================================================================
+
 void mqtt_publish()
 {
   char buf[256];
 
-   sprintf(buf,
-   "{\"CHAN0\":%6.1f, \"CHAN1\":%6.1f, \"CHAN2\":%6.1f, \"CHAN3\":%6.1f, \"CHAN4\":%6.1f, \"CHAN5\":%6.1f\
-       \"CHAN6\":%6.1f, \"CHAN7\":%6.1f, \"CHAN8\":%6.1f, \"CHAN9\":%6.1f, \"CHAN10\":%6.1f, \"CHAN11\":%6.1f}", 
+  sprintf(buf,
+    "{\"CHAN0\":%6.1f, \"CHAN1\":%6.1f, \"CHAN2\":%6.1f, \"CHAN3\":%6.1f, \"CHAN4\":%6.1f, \"CHAN5\":%6.1f\
+        \"CHAN6\":%6.1f, \"CHAN7\":%6.1f, \"CHAN8\":%6.1f, \"CHAN9\":%6.1f, \"CHAN10\":%6.1f, \"CHAN11\":%6.1f}", 
     txData.channels[0].value,
     txData.channels[1].value,
     txData.channels[2].value,
@@ -354,8 +343,7 @@ void mqtt_publish()
     txData.channels[9].value,
     txData.channels[10].value,
     txData.channels[11].value
-    );
-
+  );
   mqttClient.publish("integrants/pub/PWMstatus", buf, strlen(buf), 2);
  
   sprintf(buf, "{\"Encoder\":%d, \"ADCAngle\":%6.1f, \"ADC1\":%6.1f, \"ADC2\":%6.1f,\
@@ -366,8 +354,7 @@ void mqtt_publish()
     voltage_2_3,
     rxData.gen_frequency, 
     rxData.syn_frequency==rxData.syn_frequency?rxData.syn_frequency:0.0 
-    );
-
+  );
   mqttClient.publish("integrants/pub/SYSstatus", buf, strlen(buf), 2);
 
   pub_bits=myMCP.getPort(B);
@@ -380,8 +367,7 @@ void mqtt_publish()
     (pub_bits&0x20)==0?1:0,
     (pub_bits&0x40)==0?1:0,
     (pub_bits&0x80)==0?1:0
-    );
-
+  );
   mqttClient.publish("integrants/pub/DIPstatus", buf, strlen(buf), 2);
 
   sub_bits=myMCP.getPort(A);
@@ -395,7 +381,7 @@ void mqtt_publish()
     (sub_bits&0x04)?1:0,
     (sub_bits&0x02)?1:0,
     (sub_bits&0x01)?1:0
-    );
+  );
   mqttClient.publish("integrants/pub/LEDstatus",buf, strlen(buf), 2);
 
   sprintf(buf, "{\"Absolute\":%6.3f, \"Fine\":%3.1f, \"Medium\":%3.1f, \"Coarse\":%3.1f,\
@@ -404,17 +390,17 @@ void mqtt_publish()
     menuMapFine.getFloatValue(),
     menuMapMedium.getFloatValue(),
     menuMapCoarse.getFloatValue(),
-    0.0,0.0);
-
+  0.0,0.0);
   mqttClient.publish("integrants/pub/MAPstatus", buf, strlen(buf), 2);
+
 }
 
-void userSetup() {
+//=============================================================================
 
-//    Wire.begin(22,27);
-    Wire.begin(MCP_SDA,MCP_SCL);
-    Wire.setClock(400000);
-    setupMenu();
+void userSetup() {
+  Wire.begin(MCP_SDA,MCP_SCL);
+  Wire.setClock(400000);
+  setupMenu();
 
   Serial.begin(115200);
   while (!Serial && millis() < 5000);
@@ -431,7 +417,6 @@ void userSetup() {
 #endif
 
 #ifdef USE_I2C_DAC
-//  Wire.begin(22,27);
 
   pwmController.resetDevices();  // Resets all PCA9685 devices on i2c line
   pwmController.init();          // Initializes module using default totem-pole driver mode, and default disabled phase balancer
@@ -475,7 +460,13 @@ void userSetup() {
 
 #endif
 
+  cb_ratio(0);
+  cb_absolute(0);
+  cb_phase(0);
+
 }
+
+//=============================================================================
 
 #ifdef USE_I2C_ADC
 float readChannel(ADS1115_MUX channel) {
@@ -493,7 +484,7 @@ float readChannel(ADS1115_MUX channel) {
 
 void transmitData() {
 
-  {  //}    if (newTxData == true) {
+  if (newTxData == true) {
   //  Serial.printf("sizeoftx %d\n\r",sizeof(txData));
     Wire.beginTransmission(otherAddress);
     Wire.write((byte*)&txData, sizeof(txData));
@@ -526,7 +517,7 @@ void requestData() {
 
 
  enum menu_destination {
-  Default,
+  Default=0,
   Encoder,
   FREQ_Gen,
   FREQ_Syn,
@@ -791,6 +782,7 @@ float get_menuindex(int idx)
     return value;
 }
 
+//=============================================================================
 
 void loop() {
 
@@ -800,9 +792,13 @@ void loop() {
     target1_time += 500;
   
 // I2C send and receive to slave Pico2040 PWM generator  
+    newTxData = true;
     transmitData();
     requestData();
 
+// update data values from menu (should rewrite to callback on change where possible)
+
+// pwm angles
     txData.channels[0].value=get_menuindex(menuPWMChan0.getCurrentValue() );
     txData.channels[1].value=get_menuindex(menuPWMChan1.getCurrentValue() );
     txData.channels[2].value=get_menuindex(menuPWMChan2.getCurrentValue() );
@@ -816,6 +812,7 @@ void loop() {
     txData.channels[10].value=get_menuindex(menuPWMChan10.getCurrentValue() );
     txData.channels[11].value=get_menuindex(menuPWMChan11.getCurrentValue() );
 
+// pwm type config
     txData.channels[0].config=menuPWMConfigCH0.getCurrentValue();
     txData.channels[1].config=menuPWMConfigCH1.getCurrentValue();
     txData.channels[2].config=menuPWMConfigCH2.getCurrentValue();
@@ -829,6 +826,7 @@ void loop() {
     txData.channels[10].config=menuPWMConfigCH10.getCurrentValue();
     txData.channels[11].config=menuPWMConfigCH11.getCurrentValue();
       
+// pwm channel channel      
     txData.channels[0].channel=menuPWMChannelCH0.getCurrentValue();
     txData.channels[1].channel=menuPWMChannelCH1.getCurrentValue();
     txData.channels[2].channel=menuPWMChannelCH2.getCurrentValue();
@@ -842,23 +840,21 @@ void loop() {
     txData.channels[10].channel=menuPWMChannelCH10.getCurrentValue();
     txData.channels[11].channel=menuPWMChannelCH11.getCurrentValue();
 
-#define REF_CONST 608       // divisor for 13 volt reference output (26 v phase to phase)
-#define DIV_FACT 560        // multiplier, for menu voltage out calculation - found by experiment (needs updating)
+// pwm voltage config
+    txData.channels[0].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[1].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[2].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[3].amplitude = menuRmsNominal.getCurrentValue() * 100.0 / menuReferenceAmplitude.getCurrentValue();
+    txData.channels[4].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[5].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[6].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[7].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[8].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[9].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[10].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[11].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
 
-    txData.channels[0].amplitude=menuSynchroAmplitude.getCurrentValue();
-    txData.channels[1].amplitude=menuSynchroAmplitude.getCurrentValue();
-    txData.channels[2].amplitude=menuSynchroAmplitude.getCurrentValue();
-    txData.channels[3].amplitude=menuReferenceAmplitude.getCurrentValue();
-    txData.channels[4].amplitude=menuSynchroAmplitude.getCurrentValue();
-    txData.channels[5].amplitude=menuSynchroAmplitude.getCurrentValue();
-    txData.channels[6].amplitude=menuSynchroAmplitude.getCurrentValue();
-    txData.channels[7].amplitude=menuSynchroAmplitude.getCurrentValue();
-    txData.channels[8].amplitude=menuSynchroAmplitude.getCurrentValue();
-    txData.channels[9].amplitude=menuSynchroAmplitude.getCurrentValue();
-    txData.channels[10].amplitude=menuSynchroAmplitude.getCurrentValue();
-    txData.channels[11].amplitude=menuSynchroAmplitude.getCurrentValue();
-
-
+// adc output setting
     pwmController.setChannelPWM( 1, get_menuindex(menuDACGalv1.getCurrentValue() )); // galv
     pwmController.setChannelPWM( 2, get_menuindex(menuDACGalv2.getCurrentValue() ));
     pwmController.setChannelPWM( 3, get_menuindex(menuDACGalv3.getCurrentValue() ));
@@ -868,12 +864,13 @@ void loop() {
     pwmController.setChannelPWM( 8, get_menuindex(menuDACLamp.getCurrentValue() ));
     pwmController.setChannelPWM( 9, get_menuindex(menuDACSolenoid1.getCurrentValue() )>0?4095:0); // solenoid
     pwmController.setChannelPWM(10, get_menuindex(menuDACSolenoid2.getCurrentValue() )>0?4095:0);
-
+    // 11 unused
     pwmController.setChannelPWM(12, get_menuindex(menuDACDC1.getCurrentValue() )>0?4095:0);
     pwmController.setChannelPWM(13, get_menuindex(menuDACDC2.getCurrentValue() )>0?4095:0);
     pwmController.setChannelPWM(14, get_menuindex(menuDACDC3.getCurrentValue() )>0?4095:0);
     pwmController.setChannelPWM(15, get_menuindex(menuDACAMP.getCurrentValue() )>0?4095:0);
 
+// LED output setting
     myMCP.setPin(7, A, get_menuindex(menuLED1.getCurrentValue() ));
     myMCP.setPin(6, A, get_menuindex(menuLED2.getCurrentValue() ));
     myMCP.setPin(5, A, get_menuindex(menuLED3.getCurrentValue() ));
@@ -883,25 +880,21 @@ void loop() {
     myMCP.setPin(1, A, get_menuindex(menuLED7.getCurrentValue() ));
     myMCP.setPin(0, A, get_menuindex(menuLED8.getCurrentValue() ));
 
+// set menu display of frequencies
     menuFREQGen.setFloatValue(rxData.gen_frequency);
     menuFREQSyn.setFloatValue(rxData.syn_frequency==rxData.syn_frequency?rxData.syn_frequency:0.0);
-/*
-    encoder_pos=menuEncoder.getCurrentValue()-2048;
 
-    large_absolute=menuMapAbsolute.getLargeNumber();
-    absolute=large_absolute->getAsFloat();
-    menuMapFine.setFloatValue  (fmod((absolute         ) +   fine_offset, 360)); // fine
-    menuMapMedium.setFloatValue(fmod((absolute / ratio1) + medium_offset, 360)); // medium
-    menuMapCoarse.setFloatValue(fmod((absolute / ratio2) + coarse_offset, 360)); // coarse
-*/
+// set menu display of read synchro angle
     menuSynchroAngle.setFloatValue(rxData.adc_angle);
-    
+
+// set menu display of Horizon gyro ADC values    
     voltage_0_1=readChannel(ADS1115_COMP_0_1)*GYRO_POT_FACTOR_PITCH;
     menuADC1Voltage.setFloatValue(voltage_0_1);
 
     voltage_2_3=readChannel(ADS1115_COMP_2_3)*GYRO_POT_FACTOR_ROLL;
     menuADC2Voltage.setFloatValue(voltage_2_3);
 
+// display of PWM angles values sent to I2C client
     menuPWM0.setFloatValue(txData.channels[0].value);
     menuPWM1.setFloatValue(txData.channels[1].value);
     menuPWM2.setFloatValue(txData.channels[2].value);
@@ -915,21 +908,40 @@ void loop() {
     menuPWM10.setFloatValue(txData.channels[10].value);
     menuPWM11.setFloatValue(txData.channels[11].value);
 
+    { // special override set for moving map absolute
+      // check index
+      int idx = menuMapAbsoluteSet.getCurrentValue();
+      if(idx!=Default)
+      { 
+        // set value if not default
+        absolute = get_menuindex(idx); 
+        menuMapAbsolute.getLargeNumber()->setFromFloat(absolute);
+        abs2res(absolute);
+      }
+    }
+
   } // end if target1 time
 
 }
 
+//=============================================================================
+
+void abs2res(double abs)
+{
+  menuMapFine.setFloatValue  (fmod((absolute         ) +   fine_offset, 360)); // fine
+  menuMapMedium.setFloatValue(fmod((absolute / ratio1) + medium_offset, 360)); // medium
+  menuMapCoarse.setFloatValue(fmod((absolute / ratio2) + coarse_offset, 360)); // coarse
+}
+
+
 void CALLBACK_FUNCTION eeprom_load(int id) {
-    // TODO - your menu change code
     menuMgr.load();
 }
 
 
 void CALLBACK_FUNCTION eeprom_save(int id) {
-    // TODO - your menu change code
     menuMgr.save();
 }
-
 
 
 void CALLBACK_FUNCTION cb_encoder(int id) {
@@ -937,20 +949,27 @@ void CALLBACK_FUNCTION cb_encoder(int id) {
 }
 
 
-void CALLBACK_FUNCTION cb_absolute(int id) {
-//    large_absolute=menuMapAbsolute.getLargeNumber();
-//    absolute=large_absolute->getAsFloat();
-    absolute=menuMapAbsolute.getLargeNumber()->getAsFloat();
-    menuMapFine.setFloatValue  (fmod((absolute         ) +   fine_offset, 360)); // fine
-    menuMapMedium.setFloatValue(fmod((absolute / ratio1) + medium_offset, 360)); // medium
-    menuMapCoarse.setFloatValue(fmod((absolute / ratio2) + coarse_offset, 360)); // coarse
+void CALLBACK_FUNCTION cb_ratio(int id) {
+    ratio0 = menuMapRatio0.getLargeNumber()->getAsFloat();
+    ratio1 = menuMapRatio1.getLargeNumber()->getAsFloat();
+    ratio2 = ratio0 * ratio1;
+    abs2res(absolute);
 }
 
-// get indexed value from menu
-// 
+
+void CALLBACK_FUNCTION cb_absolute(int id) {
+    absolute=menuMapAbsolute.getLargeNumber()->getAsFloat();
+    abs2res(absolute);
+}
 
 
+void CALLBACK_FUNCTION cb_voltage(int id) {
+  float value = menuRmsNominal.getCurrentValue() * 100.0 / menuReferenceAmplitude.getCurrentValue();
+}
 
 
+void CALLBACK_FUNCTION cb_phase(int id) {
+  txData.phase_offset= menuPhaseOffset.getCurrentValue();    
+}
 
-
+//end

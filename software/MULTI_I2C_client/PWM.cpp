@@ -284,14 +284,10 @@ void pwm_setup(void)
   pinMode(pinOpSync, OUTPUT);
   pinMode(pinIpTrig, INPUT_PULLDOWN);
   build_sinetable();
-//  ref2res();  // sets T_REFERENCE
-//  abs2res(0);
   angle2res(T_FINE,pwm_synchro);
   angle2res(T_MEDIUM,pwm_synchro);
   angle2res(T_COARSE,pwm_synchro);
   angle2res(T_REFERENCE,pwm_reference);
-//  angle2res(T_REFERENCE,pwm_sineCha);
-//  angle2res(T_REFERENCE,pwm_sineChb);
   angle2res(T_HEADING,pwm_synchro);
   angle2res(T_NtoS,pwm_synchro);
 
@@ -344,20 +340,6 @@ void printPWMInfo(RP2040_PWM* PWM_Instance)
 //  delay(100);
 }
 
-/*
-void ref2res(void)
-{
-  // reference
-  transport.resolvers[T_REFERENCE].amplitude[0] = 500.0;
-  transport.resolvers[T_REFERENCE].amplitude[1] = -500.0;
-}
-
-void angle2wire(int channel, int part, float angle) {
-  float target;
-  target = fmod(angle, 360) * M_PI/180.0;
-  transport.resolvers[channel].amplitude[part] = -sin(target) * 500;
-}
-*/
 void angle2res(int channel, byte config, float value/*=NAN*/, float bump/*=0*/) {
   float target;
 
@@ -413,46 +395,6 @@ float chan_angle(int channel)
 {
   return transport.resolvers[channel].angle;
 }
-
-
-// convert required absolute film position to resolver angles
-void abs2res(float bump) {
-  float target;
-
-  absolute += bump;
-  if (absolute < 0) absolute = 0;
-
-  transport.resolvers[T_COARSE].angle = (absolute / ratio2) + coarse_offset;
-  coarse = (absolute / ratio2);
-
-  transport.resolvers[T_MEDIUM].angle = fmod((absolute / ratio1) + medium_offset, 360);
-  medium = fmod((absolute / ratio1), 360);
-
-  transport.resolvers[T_FINE].angle = fmod((absolute) + fine_offset, 360);
-  fine = fmod((absolute), 360);
-
-  // translate to modbus registers
-  //cracked_value.f = absolute;
-  //mb.Ireg(absoluteIreg, cracked_value.w[1]);
-  //mb.Ireg(absoluteIreg + 1, cracked_value.w[0]);
-
-  // fine
-  target = fmod(transport.resolvers[T_FINE].angle, 360) * M_PI / 180.0;
-  transport.resolvers[T_FINE].amplitude[0] = sin(target) * 500;
-  transport.resolvers[T_FINE].amplitude[1] = cos(target) * 500;
-  // medium
-  target = fmod(transport.resolvers[T_MEDIUM].angle, 360) * M_PI / 180.0;
-  transport.resolvers[T_MEDIUM].amplitude[0] = sin(target) * 500;
-  transport.resolvers[T_MEDIUM].amplitude[1] = cos(target) * 500;
-  // coarse
-  target = fmod(transport.resolvers[T_COARSE].angle, 360) * M_PI / 180.0;
-  transport.resolvers[T_COARSE].amplitude[0] = sin(target) * 500;
-  transport.resolvers[T_COARSE].amplitude[1] = cos(target) * 500;
-  // reference
-//  transport.resolvers[T_REFERENCE].amplitude[0] = 500.0;
-//  transport.resolvers[T_REFERENCE].amplitude[1] = -500.0;
-}
-
 
 void interrupt_process(void)
 {

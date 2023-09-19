@@ -29,8 +29,8 @@
       "type": "largeNumItem",
       "defaultValue": "0",
       "item": {
-        "digitsAllowed": 9,
-        "decimalPlaces": 3,
+        "digitsAllowed": 7,
+        "decimalPlaces": 1,
         "negativeAllowed": false,
         "name": "Map_Absolute",
         "variableName": "MapAbsolute",
@@ -48,7 +48,7 @@
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
-        "numDecimalPlaces": 3,
+        "numDecimalPlaces": 1,
         "name": "Map_Fine",
         "variableName": "MapFine",
         "id": 113,
@@ -64,7 +64,7 @@
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
-        "numDecimalPlaces": 3,
+        "numDecimalPlaces": 1,
         "name": "Map_Medium",
         "variableName": "MapMedium",
         "id": 114,
@@ -80,7 +80,7 @@
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
-        "numDecimalPlaces": 3,
+        "numDecimalPlaces": 1,
         "name": "Map_Coarse",
         "variableName": "MapCoarse",
         "id": 115,
@@ -100,6 +100,60 @@
         "name": "Synchro_Angle",
         "variableName": "SynchroAngle",
         "id": 101,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "largeNumItem",
+      "defaultValue": "31.959840435",
+      "item": {
+        "digitsAllowed": 10,
+        "decimalPlaces": 8,
+        "negativeAllowed": false,
+        "name": "Map_Ratio0",
+        "variableName": "MapRatio0",
+        "id": 121,
+        "eepromAddress": 198,
+        "functionName": "cb_ratio",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "largeNumItem",
+      "defaultValue": "32.165615772",
+      "item": {
+        "digitsAllowed": 10,
+        "decimalPlaces": 8,
+        "negativeAllowed": false,
+        "name": "Map_Ratio1",
+        "variableName": "MapRatio1",
+        "id": 123,
+        "eepromAddress": 222,
+        "functionName": "cb_ratio",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "floatItem",
+      "defaultValue": "1028.0079",
+      "item": {
+        "numDecimalPlaces": 6,
+        "name": "Cal_Ratio2",
+        "variableName": "CalRatio2",
+        "id": 124,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -929,7 +983,7 @@
     {
       "parentId": 34,
       "type": "enumItem",
-      "defaultValue": "1",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Default",
@@ -983,8 +1037,8 @@
           "MAP_Medium",
           "MAP_Fine"
         ],
-        "name": "MAP_Absolute_set",
-        "variableName": "MAPAbsoluteSet",
+        "name": "MapAbsoluteSet",
+        "variableName": "MapAbsoluteSet",
         "id": 116,
         "eepromAddress": 192,
         "readOnly": false,
@@ -2871,7 +2925,7 @@
         "name": "PWM_Config_CH5",
         "variableName": "PWMConfigCH5",
         "id": 65,
-        "eepromAddress": -1,
+        "eepromAddress": 230,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -3274,12 +3328,12 @@
     {
       "parentId": 0,
       "type": "analogItem",
-      "defaultValue": "560",
+      "defaultValue": "130",
       "item": {
-        "maxValue": 1000,
+        "maxValue": 160,
         "offset": 0,
-        "divisor": 1,
-        "unitName": "Unit",
+        "divisor": 10,
+        "unitName": "Vrms",
         "step": 1,
         "name": "Synchro_Amplitude",
         "variableName": "SynchroAmplitude",
@@ -3294,17 +3348,17 @@
     {
       "parentId": 0,
       "type": "analogItem",
-      "defaultValue": "608",
+      "defaultValue": "110",
       "item": {
-        "maxValue": 1000,
+        "maxValue": 160,
         "offset": 0,
-        "divisor": 1,
-        "unitName": "Unit",
+        "divisor": 10,
+        "unitName": "Vrms",
         "step": 1,
         "name": "Reference_Amplitude",
         "variableName": "ReferenceAmplitude",
-        "id": 64,
-        "eepromAddress": 94,
+        "id": 117,
+        "eepromAddress": 196,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -3566,6 +3620,48 @@
         "visible": true,
         "staticDataInRAM": false
       }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "802",
+      "item": {
+        "maxValue": 2000,
+        "offset": 0,
+        "divisor": 100,
+        "unitName": "",
+        "step": 1,
+        "name": "RmsNominal",
+        "variableName": "RmsNominal",
+        "id": 120,
+        "eepromAddress": 232,
+        "functionName": "cb_voltage",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "6",
+      "item": {
+        "maxValue": 255,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "",
+        "step": 1,
+        "name": "PhaseOffset",
+        "variableName": "PhaseOffset",
+        "id": 125,
+        "eepromAddress": 234,
+        "functionName": "cb_phase",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
     }
   ],
   "codeOptions": {
@@ -3577,7 +3673,7 @@
     ],
     "lastThemeUuid": "03c6b25f-db63-402a-8447-a5ce1484c14d",
     "applicationUUID": "922e1f5d-2101-4f14-98cd-fdd77949584d",
-    "applicationName": "djrm Aaiation Integrants",
+    "applicationName": "djrm Aviation Integrants",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",
@@ -3772,9 +3868,9 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C16",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "deviceIO:",
       "mcp23017:iox:32:35",
-      "mcp23017:iox1:32:-1"
+      "mcp23017:iox1:32:-1",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
