@@ -18,8 +18,8 @@
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
-#include <IoAbstraction.h>
 #include <IoAbstractionWire.h>
+#include <IoAbstraction.h>
 #include <EepromItemStorage.h>
 #include <EepromAbstractionWire.h>
 
@@ -178,8 +178,11 @@ extern BackMenuItem menuBackEEPROMData;
 extern SubMenuItem menuEEPROMData;
 extern FloatMenuItem menuSynchroAngle;
 extern AnalogMenuItem menuMapHeading;
+extern AnalogMenuItem menuMAPCoarse;
 extern FloatMenuItem menuMapCoarse;
+extern AnalogMenuItem menuMAPMedium;
 extern FloatMenuItem menuMapMedium;
+extern AnalogMenuItem menuMAPFine;
 extern FloatMenuItem menuMapFine;
 extern EditableLargeNumberMenuItem menuMapAbsolute;
 extern AnalogMenuItem menuEncoder;
@@ -194,7 +197,12 @@ void setupMenu();
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION cb_absolute(int id);
+void CALLBACK_FUNCTION cb_coarse(int id);
 void CALLBACK_FUNCTION cb_encoder(int id);
+void CALLBACK_FUNCTION cb_fine(int id);
+void CALLBACK_FUNCTION cb_heading(int id);
+void CALLBACK_FUNCTION cb_medium(int id);
+void CALLBACK_FUNCTION cb_ntos(int id);
 void CALLBACK_FUNCTION cb_phase(int id);
 void CALLBACK_FUNCTION cb_position(int id);
 void CALLBACK_FUNCTION cb_ratio(int id);

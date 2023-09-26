@@ -27,17 +27,18 @@
     {
       "parentId": 0,
       "type": "analogItem",
-      "defaultValue": "90",
+      "defaultValue": "900",
       "item": {
-        "maxValue": 180,
-        "offset": -90,
-        "divisor": 0,
+        "maxValue": 1800,
+        "offset": -900,
+        "divisor": 10,
         "unitName": "",
         "step": 1,
         "name": "Map_NtoS",
         "variableName": "MapNtoS",
         "id": 128,
         "eepromAddress": 242,
+        "functionName": "cb_ntos",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -96,6 +97,27 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
+        "visible": false,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 3600,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "MAP_Fine",
+        "variableName": "MAPFine",
+        "id": 129,
+        "eepromAddress": 252,
+        "functionName": "cb_fine",
+        "readOnly": false,
+        "localOnly": false,
         "visible": true,
         "staticDataInRAM": false
       }
@@ -110,6 +132,27 @@
         "variableName": "MapMedium",
         "id": 114,
         "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": false,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 3600,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "MAP_Medium",
+        "variableName": "MAPMedium",
+        "id": 130,
+        "eepromAddress": 256,
+        "functionName": "cb_medium",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -128,6 +171,27 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
+        "visible": false,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 3600,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "MAP_Coarse",
+        "variableName": "MAPCoarse",
+        "id": 131,
+        "eepromAddress": 260,
+        "functionName": "cb_coarse",
+        "readOnly": false,
+        "localOnly": false,
         "visible": true,
         "staticDataInRAM": false
       }
@@ -135,17 +199,18 @@
     {
       "parentId": 0,
       "type": "analogItem",
-      "defaultValue": "90",
+      "defaultValue": "900",
       "item": {
-        "maxValue": 360,
+        "maxValue": 3600,
         "offset": 0,
-        "divisor": 0,
+        "divisor": 10,
         "unitName": "",
         "step": 1,
         "name": "Map_Heading",
         "variableName": "MapHeading",
         "id": 127,
         "eepromAddress": 246,
+        "functionName": "cb_heading",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -3926,7 +3991,7 @@
       },
       {
         "name": "ENCODER_IS_QUARTER_CYCLE",
-        "latestValue": "false",
+        "latestValue": "true",
         "subsystem": "INPUT"
       },
       {
@@ -3997,8 +4062,8 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C16",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "deviceIO:",
-      "mcp23017:iox:32:35"
+      "mcp23017:iox:32:35",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

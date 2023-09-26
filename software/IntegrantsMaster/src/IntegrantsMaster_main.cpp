@@ -1,5 +1,5 @@
 #include "src_menu.h"
-#include "IntegrantsMaster_menu.h"
+//#include "IntegrantsMaster_menu.h"
 //
 //    Common to all sketches: necssary infrastructure identifiers
 //
@@ -10,11 +10,24 @@
 #define USE_I2C_DIPSW_    // MCP23017
 
 #include <Arduino.h>
+
+#if __has_include("Wifi.h")
 #include "Wifi.h"
-// has wifi credentials and mqtt broker ip addr
-#define _WIFI_SSID "my_ssid"
-#define _WIFI_PASSWORD "my_password"
-#define _MQTT_HOST IPAddress(192, 168, mqtt, ipaddr)
+#else
+#warning "Wifi.h not found, Using default Wifi settings"
+#endif
+
+#ifndef WIFI_SSID
+#define WIFI_SSID "WiFi SSID"
+#endif
+
+#ifndef WIFI_PASSWORD
+#define WIFI_PASSWORD "password"
+#endif
+
+#ifndef MQTT_HOST
+#define MQTT_HOST (192, 168, 0, 1)
+#endif
 
 
 // if using TLS, edit config.h and #define ASYNC_TCP_SSL_ENABLED 1
@@ -285,11 +298,20 @@ void onMqttMessage(const char* topic, const uint8_t* payload, size_t len,uint8_t
       abs2res(absolute);
     }
     if(doc.containsKey("Fine"))
-      menuMapFine.setFloatValue(doc["Fine"].as<float>());    
+    {
+//      menuMapFine.setFloatValue(doc["Fine"].as<float>());   
+      menuMAPFine.setCurrentValue  (10.0 * doc["Fine"].as<float>()); // fine
+    }  
     if(doc.containsKey("Medium"))
-      menuMapMedium.setFloatValue(doc["Medium"].as<float>());    
+    {
+//      menuMapMedium.setFloatValue(doc["Medium"].as<float>());
+      menuMAPMedium.setCurrentValue(10.0 * doc["Medium"].as<float>());
+    }
     if(doc.containsKey("Coarse"))
-      menuMapCoarse.setFloatValue(doc["Coarse"].as<float>());    
+    {
+//      menuMapCoarse.setFloatValue(doc["Coarse"].as<float>());
+      menuMAPCoarse.setCurrentValue(10.0 * doc["Coarse"].as<float>());
+    }
 
   }
   else if(0==strcmp(topic,DigitalTopic))
@@ -407,12 +429,17 @@ void mqtt_publish()
 #endif
 
   sprintf(buf, "{\"Absolute\":%6.3f, \"Fine\":%3.1f, \"Medium\":%3.1f, \"Coarse\":%3.1f,\
-   \"Heading\":%3.0f, \"NtoS\":%3.0f}", 
+   \"Heading\":%3.1f, \"NtoS\":%3.1f}", 
     absolute,
-    menuMapFine.getFloatValue(),
-    menuMapMedium.getFloatValue(),
-    menuMapCoarse.getFloatValue(),
-  0.0,0.0);
+//    menuMapFine.getFloatValue(),
+//    menuMapMedium.getFloatValue(),
+//    menuMapCoarse.getFloatValue(),
+    menuMAPFine.getCurrentValue() / 10.0,
+    menuMAPMedium.getCurrentValue() / 10.0,
+    menuMAPCoarse.getCurrentValue() / 10.0,
+    menuMapHeading.getCurrentValue() / 10.0,
+    menuMapNtoS.getCurrentValue() / 10.0
+  );
   mqttClient.publish("integrants/pub/MAPstatus", buf, strlen(buf), 2);
 
 }
@@ -822,35 +849,50 @@ float get_menuindex(int idx)
         break;
 
       case MAP_Coarse:
-        value = menuMapCoarse.getFloatValue(); // coarse
+//        value = menuMapCoarse.getFloatValue(); // coarse
+        value = menuMAPCoarse.getCurrentValue() / 10.0;
         break;
 
       case MAP_Medium:
-        value = menuMapMedium.getFloatValue(); // medium
+//        value = menuMapMedium.getFloatValue(); // medium
+        value = menuMAPMedium.getCurrentValue() / 10.0;
         break;
 
       case MAP_Fine:
-        value = menuMapFine.getFloatValue(); // fine
+//        value = menuMapFine.getFloatValue(); // fine
+        value = menuMAPFine.getCurrentValue() / 10.0;
         break;
 
       case MAP_Position:
-        absolute = 10.0 * menuMapPosition.getCurrentValue();
-        menuMapAbsolute.getLargeNumber()->setFromFloat(absolute);
-        abs2res(absolute);
-        value = absolute;
+        value = 10.0 * menuMapPosition.getCurrentValue();
         break;
 
       case MAP_Heading:
-        value = menuMapHeading.getCurrentValue();
-        break;
+        value = menuMapHeading.getCurrentValue() / 10.0;
+         break;
 
       case MAP_NtoS:
-        value = menuMapNtoS.getCurrentValue();
+        value = menuMapNtoS.getCurrentValue() / 10.0;
         break;
 
 
     }
     return value;
+}
+
+void update_pwm_angles(void) {
+  txData.channels[0].value=get_menuindex(menuPWMChan0.getCurrentValue() );
+  txData.channels[1].value=get_menuindex(menuPWMChan1.getCurrentValue() );
+  txData.channels[2].value=get_menuindex(menuPWMChan2.getCurrentValue() );
+  txData.channels[3].value=get_menuindex(menuPWMChan3.getCurrentValue() );
+  txData.channels[4].value=get_menuindex(menuPWMChan4.getCurrentValue() );
+  txData.channels[5].value=get_menuindex(menuPWMChan5.getCurrentValue() );
+  txData.channels[6].value=get_menuindex(menuPWMChan6.getCurrentValue() );
+  txData.channels[7].value=get_menuindex(menuPWMChan7.getCurrentValue() );
+  txData.channels[8].value=get_menuindex(menuPWMChan8.getCurrentValue() );
+  txData.channels[9].value=get_menuindex(menuPWMChan9.getCurrentValue() );
+  txData.channels[10].value=get_menuindex(menuPWMChan10.getCurrentValue() );
+  txData.channels[11].value=get_menuindex(menuPWMChan11.getCurrentValue() );
 }
 
 //=============================================================================
@@ -859,31 +901,14 @@ void loop() {
 
   taskManager.runLoop();
 
-//  mcp23017.digitalWriteS(led3, mcp23017.digitalReadS(sw3) ? 0:1 );
-
   if (target1_time < millis() ) {
     target1_time += 500;
   
 // I2C send and receive to slave Pico2040 PWM generator  
     newTxData = true;
-    transmitData();
-    requestData();
+    // pwm angles calculated below ...
 
 // update data values from menu (should rewrite to callback on change where possible)
-
-// pwm angles
-    txData.channels[0].value=get_menuindex(menuPWMChan0.getCurrentValue() );
-    txData.channels[1].value=get_menuindex(menuPWMChan1.getCurrentValue() );
-    txData.channels[2].value=get_menuindex(menuPWMChan2.getCurrentValue() );
-    txData.channels[3].value=get_menuindex(menuPWMChan3.getCurrentValue() );
-    txData.channels[4].value=get_menuindex(menuPWMChan4.getCurrentValue() );
-    txData.channels[5].value=get_menuindex(menuPWMChan5.getCurrentValue() );
-    txData.channels[6].value=get_menuindex(menuPWMChan6.getCurrentValue() );
-    txData.channels[7].value=get_menuindex(menuPWMChan7.getCurrentValue() );
-    txData.channels[8].value=get_menuindex(menuPWMChan8.getCurrentValue() );
-    txData.channels[9].value=get_menuindex(menuPWMChan9.getCurrentValue() );
-    txData.channels[10].value=get_menuindex(menuPWMChan10.getCurrentValue() );
-    txData.channels[11].value=get_menuindex(menuPWMChan11.getCurrentValue() );
 
 // pwm type config
     txData.channels[0].config=menuPWMConfigCH0.getCurrentValue();
@@ -992,49 +1017,39 @@ void loop() {
     menuPWM11.setFloatValue(txData.channels[11].value);
 
 
-
-
-/*
-//    { // special override set for moving map absolute
-      // check index
-//      int idx = menuMapAbsoluteSet.getCurrentValue();
-//      if(idx!=Default)
-      if(menuMapAbsoluteSet.getCurrentValue() != Default)
-      { 
-        menuMapAbsolute.getLargeNumber()->setFromFloat(get_menuindex(menuMapAbsoluteSet.getCurrentValue()));
-     // set value if not default
-     //   absolute = get_menuindex(idx); 
-     //   menuMapAbsolute.getLargeNumber()->setFromFloat(absolute);
-     //   abs2res(absolute);
-      }
-//    }
-*/
-
   } // end if target1 time
+
+  if(newTxData)
+  {
+    update_pwm_angles();
+    transmitData();
+    requestData();
+  }
 
 }
 
 //=============================================================================
 
 void abs2res(double abs)
-{ float coarse;
+{
   if(absolute>184790.0)absolute=184790.0;
-  menuMapFine.setFloatValue  (fmod((absolute         ) +   fine_offset, 360)); // fine
-  menuMapMedium.setFloatValue(fmod((absolute / ratio1) + medium_offset, 360)); // medium
-  coarse=fmod((absolute / ratio2) + coarse_offset, 360);
-  if(coarse>180.0)coarse=180.0;
+//  menuMapFine.setFloatValue  (fmod((absolute         ) +   fine_offset, 360)); // fine
+//  menuMapMedium.setFloatValue(fmod((absolute / ratio1) + medium_offset, 360)); // medium
 //  menuMapCoarse.setFloatValue(fmod((absolute / ratio2) + coarse_offset, 360)); // coarse
-  menuMapCoarse.setFloatValue(coarse); // coarse
+  menuMAPFine.setCurrentValue  (10.0 * fmod((absolute         ) +   fine_offset, 360)); // fine
+  menuMAPMedium.setCurrentValue(10.0 * fmod((absolute / ratio1) + medium_offset, 360)); // medium
+  menuMAPCoarse.setCurrentValue(10.0 * fmod((absolute / ratio2) + coarse_offset, 360)); // coarse
+  newTxData = true;
 }
 
 
 void CALLBACK_FUNCTION eeprom_load(int id) {
-    menuMgr.load();
+  menuMgr.load();
 }
 
 
 void CALLBACK_FUNCTION eeprom_save(int id) {
-    menuMgr.save();
+  menuMgr.save();
 }
 
 
@@ -1044,20 +1059,24 @@ void CALLBACK_FUNCTION cb_encoder(int id) {
 
 
 void CALLBACK_FUNCTION cb_ratio(int id) {
-    ratio0 = menuMapRatio0.getLargeNumber()->getAsFloat();
-    ratio1 = menuMapRatio1.getLargeNumber()->getAsFloat();
-    ratio2 = ratio0 * ratio1;
-    abs2res(absolute);
+  ratio0 = menuMapRatio0.getLargeNumber()->getAsFloat();
+  ratio1 = menuMapRatio1.getLargeNumber()->getAsFloat();
+  ratio2 = ratio0 * ratio1;
+  abs2res(absolute);
+}
+
+
+void CALLBACK_FUNCTION cb_position(int id) {
+  absolute = 10.0 * menuMapPosition.getCurrentValue();
+  menuMapAbsolute.getLargeNumber()->setFromFloat(absolute);
+  abs2res(absolute); // also sets newTxData
 }
 
 
 void CALLBACK_FUNCTION cb_absolute(int id) {
-    absolute=menuMapAbsolute.getLargeNumber()->getAsFloat();
-    abs2res(absolute);
-    menuMapPosition.setCurrentValue(absolute/10.0); // update position for encoder
-
-
-
+  absolute=menuMapAbsolute.getLargeNumber()->getAsFloat();
+  menuMapPosition.setCurrentValue(absolute/10.0); 
+  abs2res(absolute); // also sets newTxData
 }
 
 
@@ -1071,10 +1090,28 @@ void CALLBACK_FUNCTION cb_phase(int id) {
 }
 
 
-void CALLBACK_FUNCTION cb_position(int id) {
-    // TODO - your menu change code
-        menuMapAbsolute.getLargeNumber()->setFromFloat(get_menuindex(menuMapAbsoluteSet.getCurrentValue()));
+void CALLBACK_FUNCTION cb_ntos(int id) {
+  newTxData = true;
 }
 
+
+void CALLBACK_FUNCTION cb_heading(int id) {
+  newTxData = true;
+}
+
+
+void CALLBACK_FUNCTION cb_coarse(int id) {
+  newTxData = true;
+}
+
+
+void CALLBACK_FUNCTION cb_medium(int id) {
+  newTxData = true;
+}
+
+
+void CALLBACK_FUNCTION cb_fine(int id) {
+  newTxData = true;
+}
 
 //end

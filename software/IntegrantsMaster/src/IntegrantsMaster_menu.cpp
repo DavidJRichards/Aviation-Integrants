@@ -2122,20 +2122,26 @@ BackMenuItem menuBackEEPROMData(&minfoEEPROMData, &menuEepromSave, INFO_LOCATION
 SubMenuItem menuEEPROMData(&minfoEEPROMData, &menuBackEEPROMData, &menuRoutingTable, INFO_LOCATION_PGM);
 const PROGMEM FloatMenuInfo minfoSynchroAngle = { "Synchro_Angle", 101, 0xffff, 1, NO_CALLBACK };
 FloatMenuItem menuSynchroAngle(&minfoSynchroAngle, 0.0, &menuEEPROMData, INFO_LOCATION_PGM);
-const PROGMEM AnalogMenuInfo minfoMapHeading = { "Map_Heading", 127, 246, 360, NO_CALLBACK, 0, 1, "" };
-AnalogMenuItem menuMapHeading(&minfoMapHeading, 90, &menuSynchroAngle, INFO_LOCATION_PGM);
+const PROGMEM AnalogMenuInfo minfoMapHeading = { "Map_Heading", 127, 246, 3600, cb_heading, 0, 10, "" };
+AnalogMenuItem menuMapHeading(&minfoMapHeading, 900, &menuSynchroAngle, INFO_LOCATION_PGM);
+const PROGMEM AnalogMenuInfo minfoMAPCoarse = { "MAP_Coarse", 131, 260, 3600, cb_coarse, 0, 10, "Unit" };
+AnalogMenuItem menuMAPCoarse(&minfoMAPCoarse, 0, &menuMapHeading, INFO_LOCATION_PGM);
 const PROGMEM FloatMenuInfo minfoMapCoarse = { "Map_Coarse", 115, 0xffff, 1, NO_CALLBACK };
-FloatMenuItem menuMapCoarse(&minfoMapCoarse, 0.0, &menuMapHeading, INFO_LOCATION_PGM);
+FloatMenuItem menuMapCoarse(&minfoMapCoarse, 0.0, &menuMAPCoarse, INFO_LOCATION_PGM);
+const PROGMEM AnalogMenuInfo minfoMAPMedium = { "MAP_Medium", 130, 256, 3600, cb_medium, 0, 10, "Unit" };
+AnalogMenuItem menuMAPMedium(&minfoMAPMedium, 0, &menuMapCoarse, INFO_LOCATION_PGM);
 const PROGMEM FloatMenuInfo minfoMapMedium = { "Map_Medium", 114, 0xffff, 1, NO_CALLBACK };
-FloatMenuItem menuMapMedium(&minfoMapMedium, 0.0, &menuMapCoarse, INFO_LOCATION_PGM);
+FloatMenuItem menuMapMedium(&minfoMapMedium, 0.0, &menuMAPMedium, INFO_LOCATION_PGM);
+const PROGMEM AnalogMenuInfo minfoMAPFine = { "MAP_Fine", 129, 252, 3600, cb_fine, 0, 10, "Unit" };
+AnalogMenuItem menuMAPFine(&minfoMAPFine, 0, &menuMapMedium, INFO_LOCATION_PGM);
 const PROGMEM FloatMenuInfo minfoMapFine = { "Map_Fine", 113, 0xffff, 1, NO_CALLBACK };
-FloatMenuItem menuMapFine(&minfoMapFine, 0.0, &menuMapMedium, INFO_LOCATION_PGM);
+FloatMenuItem menuMapFine(&minfoMapFine, 0.0, &menuMAPFine, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoMapAbsolute = { "MAP_Absolute", 112, 180, 0, cb_absolute };
 EditableLargeNumberMenuItem menuMapAbsolute(&minfoMapAbsolute, LargeFixedNumber(7, 1, 0U, 0U, false), false, &menuMapFine, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoEncoder = { "Rotary Encoder", 50, 0xffff, 4096, cb_encoder, -2048, 1, "" };
 AnalogMenuItem menuEncoder(&minfoEncoder, 2048, &menuMapAbsolute, INFO_LOCATION_PGM);
-const PROGMEM AnalogMenuInfo minfoMapNtoS = { "Map_NtoS", 128, 242, 180, NO_CALLBACK, -90, 1, "" };
-AnalogMenuItem menuMapNtoS(&minfoMapNtoS, 90, &menuEncoder, INFO_LOCATION_PGM);
+const PROGMEM AnalogMenuInfo minfoMapNtoS = { "Map_NtoS", 128, 242, 1800, cb_ntos, -900, 10, "" };
+AnalogMenuItem menuMapNtoS(&minfoMapNtoS, 900, &menuEncoder, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoMapPosition = { "Map_Position", 126, 238, 19000, cb_position, 0, 1, "0" };
 AnalogMenuItem menuMapPosition(&minfoMapPosition, 60, &menuMapNtoS, INFO_LOCATION_PGM);
 
@@ -2144,6 +2150,9 @@ void setupMenu() {
     setSizeBasedEEPROMStorageEnabled(true);
     menuMgr.setEepromRef(&glI2cRom);
     // Now add any readonly, non-remote and visible flags.
+    menuMapCoarse.setVisible(false);
+    menuMapMedium.setVisible(false);
+    menuMapFine.setVisible(false);
     menuEEPValue4.setStep(8);
     menuEEPValue1.setStep(8);
     menuEEPValue3.setStep(8);
@@ -2155,7 +2164,7 @@ void setupMenu() {
     gfx.setRotation(3);
     renderer.setUpdatesPerSecond(20);
     switches.init(ioexp_iox, SWITCHES_NO_POLLING, true);
-    menuMgr.initForEncoder(&renderer, &menuMapPosition, 13, 14, 15);
+    menuMgr.initForEncoder(&renderer, &menuMapPosition, 13, 14, 15, QUARTER_CYCLE);
     menuMgr.setBackButton(11);
     menuMgr.setNextButton(12);
     remoteServer.addConnection(&ethernetConnection);

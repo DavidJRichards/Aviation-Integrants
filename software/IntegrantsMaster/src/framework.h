@@ -17,7 +17,7 @@
  * d) a default error handler   
 */
 #include <PangolinMQTT.h> 
-#define LIBRARY "PangolinMQTT "PANGO_VERSION
+#define LIBRARY "PangolinMQTT " PANGO_VERSION
 PangolinMQTT mqttClient;
 
 #if ASYNC_TCP_SSL_ENABLED
