@@ -6,14 +6,31 @@
 #include <XPT2046_Touchscreen.h>
 
 #include <IoAbstractionWire.h>
-const int encoderA = 14;
-const int encoderB = 13;
-const int encoderOK = 15;
-const int ledA = 0;
-const int ledB = 1;
-//const int attachedInterruptPin = 35;
-//MCP23017IoAbstraction mcp23017(0x20, ACTIVE_LOW_OPEN,  attachedInterruptPin, IO_PIN_NOT_DEFINED);
-MCP23017IoAbstraction mcp23017(0x20, ACTIVE_LOW_OPEN, IO_PIN_NOT_DEFINED);
+const int sw1=8;
+const int sw2=9;
+const int sw3=10;
+const int ledA = 7;
+const int ledB = 6;
+const int ledC = 5;
+const int attachedInterruptPin = 35;
+MCP23017IoAbstraction mcp23017(0x20, ACTIVE_LOW_OPEN,  attachedInterruptPin, IO_PIN_NOT_DEFINED);
+//MCP23017IoAbstraction mcp23017(0x20, ACTIVE_LOW_OPEN, IO_PIN_NOT_DEFINED);
+
+void onKeyPressed(pinid_t key, bool held) {
+    serdebugF3("key pressed", key, held);
+    mcp23017.digitalWrite(ledA, HIGH);
+//    mcp23017.digitalWriteS(ledB, HIGH);
+}
+
+//
+// called whenever the button on the encoder is released, see the switches.onRelease below
+//
+void onKeyReleased(pinid_t key, bool held) {
+    serdebugF3("key released", key, held);
+    mcp23017.digitalWrite(ledA, LOW);
+//    mcp23017.digitalWriteS(ledB, LOW);
+}
+
 
 static uint16_t const SCREEN_WIDTH    = 320;
 static uint16_t const SCREEN_HEIGHT   = 240;
@@ -56,6 +73,13 @@ void setup() {
     setupMenu();
 //    touchDevice.calibrate(cal);
 
+    mcp23017.pinMode(ledA, OUTPUT);
+    mcp23017.pinMode(ledB, OUTPUT);
+    mcp23017.pinMode(ledC, OUTPUT);
+//    switches.init(asIoRef(mcp23017), SWITCHES_NO_POLLING, true);
+    switches.init(asIoRef(mcp23017), SWITCHES_POLL_EVERYTHING, true);
+    switches.addSwitch(sw1, onKeyPressed, 20);
+    switches.onRelease(sw1, onKeyReleased);
 
 }
 
@@ -85,6 +109,10 @@ void loop() {
         menuMapFine.setFloatValue  (fmod((absolute         ) +   fine_offset, 360)); // fine
         menuMapMedium.setFloatValue(fmod((absolute / ratio1) + medium_offset, 360)); // medium
         menuMapCoarse.setFloatValue(fmod((absolute / ratio2) + coarse_offset, 360)); // coarse
+
+
+    mcp23017.digitalWriteS(ledB, mcp23017.digitalReadS(sw2) ? 0:1 );
+    mcp23017.digitalWriteS(ledC, mcp23017.digitalReadS(sw3) ? 0:1 );
 
 }
 
@@ -137,5 +165,10 @@ void CALLBACK_FUNCTION cb_ratio(int id) {
 
 
 void CALLBACK_FUNCTION cb_phase(int id) {
+    // TODO - your menu change code
+}
+
+
+void CALLBACK_FUNCTION cb_position(int id) {
     // TODO - your menu change code
 }

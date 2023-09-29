@@ -14,6 +14,8 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include "tcMenuTfteSpi.h"
+#include <graphics/MenuTouchScreenEncoder.h>
+#include "tcMenuAdaTouchDriver.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
@@ -29,12 +31,14 @@ extern TcMenuRemoteServer remoteServer;
 extern TFT_eSPI gfx;
 extern TfteSpiDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
+extern XPT2046_Touchscreen touchDevice;
+extern iotouch::AdaLibTouchInterrogator touchInterrogator;
+extern MenuTouchScreenManager touchScreen;
 extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
 
 // Any externals needed by IO expanders, EEPROMs etc
 extern IoAbstractionRef ioexp_iox;
-extern IoAbstractionRef ioexp_iox1;
 
 // Global Menu Item exports
 extern AnalogMenuItem menuPhaseOffset;
@@ -85,25 +89,9 @@ extern EnumMenuItem menuPWMConfigCH1;
 extern EnumMenuItem menuPWMConfigCH0;
 extern BackMenuItem menuBackSynchroConfig;
 extern SubMenuItem menuSynchroConfig;
-extern AnalogMenuItem menuEEPAngle5;
-extern AnalogMenuItem menuEEPAngle4;
-extern AnalogMenuItem menuEEPAngle3;
-extern AnalogMenuItem menuEEPAngle2;
-extern AnalogMenuItem menuEEPAngle1;
-extern AnalogMenuItem menuEEPValue5;
-extern AnalogMenuItem menuEEPValue4;
-extern AnalogMenuItem menuEEPValue3;
-extern AnalogMenuItem menuEEPValue2;
-extern AnalogMenuItem menuEEPValue1;
-extern BooleanMenuItem menuEEPDigital5;
-extern BooleanMenuItem menuEEPDigital4;
-extern BooleanMenuItem menuEEPDigital3;
-extern BooleanMenuItem menuEEPDigital2;
-extern BooleanMenuItem menuEEPDigital1;
-extern ActionMenuItem menuEepromLoad;
-extern ActionMenuItem menuEepromSave;
-extern BackMenuItem menuBackEEPROMData;
-extern SubMenuItem menuEEPROMData;
+extern FloatMenuItem menuCalRatio2;
+extern EditableLargeNumberMenuItem menuMapRatio1;
+extern EditableLargeNumberMenuItem menuMapRatio0;
 extern EnumMenuInfo minfoLED8;
 extern EnumMenuItem menuLED8;
 extern EnumMenuInfo minfoLED7;
@@ -174,18 +162,35 @@ extern EnumMenuInfo minfoPWMChan0;
 extern EnumMenuItem menuPWMChan0;
 extern BackMenuItem menuBackRoutingTable;
 extern SubMenuItem menuRoutingTable;
-extern FloatMenuItem menuCalRatio2;
-extern EditableLargeNumberMenuItem menuMapRatio1;
-extern EditableLargeNumberMenuItem menuMapRatio0;
+extern AnalogMenuItem menuEEPAngle5;
+extern AnalogMenuItem menuEEPAngle4;
+extern AnalogMenuItem menuEEPAngle3;
+extern AnalogMenuItem menuEEPAngle2;
+extern AnalogMenuItem menuEEPAngle1;
+extern AnalogMenuItem menuEEPValue5;
+extern AnalogMenuItem menuEEPValue4;
+extern AnalogMenuItem menuEEPValue3;
+extern AnalogMenuItem menuEEPValue2;
+extern AnalogMenuItem menuEEPValue1;
+extern BooleanMenuItem menuEEPDigital5;
+extern BooleanMenuItem menuEEPDigital4;
+extern BooleanMenuItem menuEEPDigital3;
+extern BooleanMenuItem menuEEPDigital2;
+extern BooleanMenuItem menuEEPDigital1;
+extern ActionMenuItem menuEepromLoad;
+extern ActionMenuItem menuEepromSave;
+extern BackMenuItem menuBackEEPROMData;
+extern SubMenuItem menuEEPROMData;
 extern FloatMenuItem menuSynchroAngle;
 extern FloatMenuItem menuMapCoarse;
 extern FloatMenuItem menuMapMedium;
 extern FloatMenuItem menuMapFine;
 extern EditableLargeNumberMenuItem menuMapAbsolute;
 extern AnalogMenuItem menuEncoder;
+extern AnalogMenuItem menuMapPosition;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuEncoder; }
+inline MenuItem& rootMenuItem() { return menuMapPosition; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
@@ -194,6 +199,7 @@ void setupMenu();
 void CALLBACK_FUNCTION cb_absolute(int id);
 void CALLBACK_FUNCTION cb_encoder(int id);
 void CALLBACK_FUNCTION cb_phase(int id);
+void CALLBACK_FUNCTION cb_position(int id);
 void CALLBACK_FUNCTION cb_ratio(int id);
 void CALLBACK_FUNCTION cb_voltage(int id);
 void CALLBACK_FUNCTION eeprom_load(int id);

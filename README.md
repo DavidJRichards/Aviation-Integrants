@@ -8,21 +8,23 @@ Modular microprocessor circuits for exercising aviation instruments
 
 ### Dual processor Integrated master / client system
 
+projects now build in VSCode/PlatformIO
+
 Master using ESP32 CYD tft touch display
 
-[Integrants I2C master](./software/CYD_I2C_master)
+[Integrants I2C master](./software/IntegrantsMaster)
 
 Client using RP2040 PWM generators
 
-[Integrants I2C client](./software/MULTI_I2C_client)
+[Integrants I2C client](./software/IntegrantsCient)
 
 ### H6 Horizon driver - initial versions
 
-[HSI Exerciser](./software/DIAG_HSI_Exerciser)
+[HSI Exerciser](./software/backup/DIAG_HSI_Exerciser)
 
-[HyperIMU plotter](./software/picow_hyperimu_plotter)
+[HyperIMU plotter](./software/backup/picow_hyperimu_plotter)
 
-[Wifi server](./software/DAIG_i2c_slave)
+[Wifi server](./software/backup/DAIG_i2c_slave)
 
 ## Videos
 
