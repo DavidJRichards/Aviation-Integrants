@@ -24,6 +24,8 @@ Menu and MQTT inputs are available to set the position of the moving map display
 
 The software relies heavily on pre-built Arduino libraries, The main ones used are for the menu, wifi communications, and the i/o devices.
 
+[MAX532 MDAC interface](./MAX532-MDAC.md)
+
 ##### Libraries used:
 
 |Function   |     |
