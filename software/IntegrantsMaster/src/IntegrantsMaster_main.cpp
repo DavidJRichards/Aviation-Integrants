@@ -942,7 +942,7 @@ void loop() {
     txData.channels[0].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
     txData.channels[1].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
     txData.channels[2].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
-    txData.channels[3].amplitude = menuRmsNominal.getCurrentValue() * 100.0 / menuReferenceAmplitude.getCurrentValue();
+    txData.channels[3].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
     txData.channels[4].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
     txData.channels[5].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
     txData.channels[6].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();

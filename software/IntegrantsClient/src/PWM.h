@@ -4,7 +4,7 @@
 #define _TIMERINTERRUPT_LOGLEVEL_     0 //4
 #define _PWM_LOGLEVEL_                2 //2
 
-#define pinOpSync     14
+#define pinOpSync     -1
 #define pinIpTrig     15
 
 extern volatile word gen_usperiod;
@@ -16,12 +16,11 @@ extern uint32_t filter(uint32_t);
 extern void syncInput(void);
 extern void interrupt_process(void);
 
-#define NUM_OF_PINS 12 //4 //12 // two per resolver
+#define NUM_OF_PINS 10 // two per resolver
 enum RESOLVERS { ABSOLUTE = -1,
                  T_FINE = 0,
                  T_MEDIUM,
                  T_COARSE,
-                 T_REFERENCE,
                  T_HEADING,
                  T_NtoS };
 

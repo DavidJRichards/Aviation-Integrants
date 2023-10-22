@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include "PWM.h"
+#include "MAX532spi.h"
 
 #if ( defined(ARDUINO_NANO_RP2040_CONNECT) || defined(ARDUINO_RASPBERRY_PI_PICO) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) || \
       defined(ARDUINO_GENERIC_RP2040) ) && defined(ARDUINO_ARCH_MBED)
@@ -51,7 +52,8 @@ float roll = 0.0;
   pwm_resolver,
   pwm_sineCha,
   pwm_sineChb,
-  pwm_reference
+  pwm_reference,
+  dac_resolver
  };
 
 
@@ -67,10 +69,10 @@ volatile int step_index = 0;
 int amplitude_div = DIV_CONST;
 int amplitude_ref = REF_CONST;  // default reference amplitude is just 8v to limit amplifier power dissipation
 
-uint32_t PWM_Pins[NUM_OF_PINS]     = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+uint32_t PWM_Pins[NUM_OF_PINS]     = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 RP2040_PWM* PWM_Instance[NUM_OF_PINS];
 
-int pwm_volts[12]={DIV_FACT, DIV_FACT, DIV_FACT, REF_CONST, DIV_FACT, DIV_FACT,
+int pwm_volts[12]={DIV_FACT, DIV_FACT, DIV_FACT, DIV_FACT, DIV_FACT, DIV_FACT,
                    DIV_FACT, DIV_FACT, DIV_FACT, DIV_FACT, DIV_FACT, DIV_FACT};
 
 volatile word gen_usperiod;
@@ -84,9 +86,8 @@ transport_t transport = {
   "Fine",     "sin",  NULL, PWM_Pins[0],  0.0, "cos",   NULL, PWM_Pins[1],  0.0, 0.0, 0, 0, 0.0, 0.0,   // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
   "Medium",   "sin",  NULL, PWM_Pins[2],  0.0, "cos",   NULL, PWM_Pins[3],  0.0, 0.0, 0, 0, 0.0, 0.0,   // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
   "Coarse",   "sin",  NULL, PWM_Pins[4],  0.0, "cos",   NULL, PWM_Pins[5],  0.0, 0.0, 0, 0, 0.0, 0.0,   // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
-  "Reference","ref+", NULL, PWM_Pins[6],  0.0, "ref-",  NULL, PWM_Pins[7],  0.0, 0.0, 0, 0, 0.0, 0.0,   // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
-  "Heading",  "sin",  NULL, PWM_Pins[8],  0.0, "cos",   NULL, PWM_Pins[9],  0.0, 0.0, 0, 0, 0.0, 0.0,   // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
-  "NtoS",     "sin",  NULL, PWM_Pins[10], 0.0, "cos",   NULL, PWM_Pins[11], 0.0, 0.0, 0, 0, 0.0, 0.0,   // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
+  "Heading",  "sin",  NULL, PWM_Pins[6],  0.0, "cos",   NULL, PWM_Pins[7],  0.0, 0.0, 0, 0, 0.0, 0.0,   // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
+  "NtoS",     "sin",  NULL, PWM_Pins[8],  0.0, "cos",   NULL, PWM_Pins[9],  0.0, 0.0, 0, 0, 0.0, 0.0,   // name, instance, pin, level, instance, pin, level, angle, scale1, scale2
   0L,                                                                                                   // absolute
   10,                                                                                                   // autostep
   false,                                                                                                // automatic
@@ -167,25 +168,6 @@ bool TimerHandler0(struct repeating_timer *t)
   // sine_table is +- 512 ( 10 bits )
   // scale is +- 500 (10 bits )
   // product is 20 bits - needs to be 10 - so divide by 10 bits
-#if 0  
-  dc_levels[0] = MID_POINT_INT + transport.resolvers[0].amplitude[0] * int_sine_step_value / amplitude_div;
-  dc_levels[1] = MID_POINT_INT + transport.resolvers[0].amplitude[1] * int_sine_step_value / amplitude_div;
-
-  dc_levels[2] = MID_POINT_INT + transport.resolvers[1].amplitude[0] * int_sine_step_value / amplitude_div;
-  dc_levels[3] = MID_POINT_INT + transport.resolvers[1].amplitude[1] * int_sine_step_value / amplitude_div;
-
-  dc_levels[4] = MID_POINT_INT + transport.resolvers[2].amplitude[0] * int_sine_step_value / amplitude_div;
-  dc_levels[5] = MID_POINT_INT + transport.resolvers[2].amplitude[1] * int_sine_step_value / amplitude_div;
-
-  dc_levels[6] = MID_POINT_INT + transport.resolvers[3].amplitude[0] * int_sine_step_value / amplitude_ref;  // reference +sinewave output
-  dc_levels[7] = MID_POINT_INT + transport.resolvers[3].amplitude[1] * int_sine_step_value / amplitude_ref;  // reference -sinewave output
-
-  dc_levels[8] = MID_POINT_INT + transport.resolvers[4].amplitude[0] * int_sine_step_value / amplitude_div;
-  dc_levels[9] = MID_POINT_INT + transport.resolvers[4].amplitude[1] * int_sine_step_value / amplitude_div;
-
-  dc_levels[10] = MID_POINT_INT + transport.resolvers[5].amplitude[0] * int_sine_step_value / amplitude_div;
-  dc_levels[11] = MID_POINT_INT + transport.resolvers[5].amplitude[1] * int_sine_step_value / amplitude_div;
-#else
   dc_levels[0] = MID_POINT_INT + transport.resolvers[0].amplitude[0] * int_sine_step_value / pwm_volts[0];
   dc_levels[1] = MID_POINT_INT + transport.resolvers[0].amplitude[1] * int_sine_step_value / pwm_volts[0];
 
@@ -195,15 +177,12 @@ bool TimerHandler0(struct repeating_timer *t)
   dc_levels[4] = MID_POINT_INT + transport.resolvers[2].amplitude[0] * int_sine_step_value / pwm_volts[2];
   dc_levels[5] = MID_POINT_INT + transport.resolvers[2].amplitude[1] * int_sine_step_value / pwm_volts[2];
 
-  dc_levels[6] = MID_POINT_INT + transport.resolvers[3].amplitude[0] * int_sine_step_value / pwm_volts[3];  // reference +sinewave output
-  dc_levels[7] = MID_POINT_INT + transport.resolvers[3].amplitude[1] * int_sine_step_value / pwm_volts[3];  // reference -sinewave output
+  dc_levels[6] = MID_POINT_INT + transport.resolvers[3].amplitude[0] * int_sine_step_value / pwm_volts[3];
+  dc_levels[7] = MID_POINT_INT + transport.resolvers[3].amplitude[1] * int_sine_step_value / pwm_volts[3];
 
   dc_levels[8] = MID_POINT_INT + transport.resolvers[4].amplitude[0] * int_sine_step_value / pwm_volts[4];
   dc_levels[9] = MID_POINT_INT + transport.resolvers[4].amplitude[1] * int_sine_step_value / pwm_volts[4];
 
-  dc_levels[10] = MID_POINT_INT + transport.resolvers[5].amplitude[0] * int_sine_step_value / pwm_volts[5];
-  dc_levels[11] = MID_POINT_INT + transport.resolvers[5].amplitude[1] * int_sine_step_value / pwm_volts[5];
-#endif
   PWM_Instance[0]->setPWM_manual_Fast(PWM_Pins[0], dc_levels[0]);
   PWM_Instance[1]->setPWM_manual_Fast(PWM_Pins[1], dc_levels[1]);
   PWM_Instance[2]->setPWM_manual_Fast(PWM_Pins[2], dc_levels[2]);
@@ -214,8 +193,6 @@ bool TimerHandler0(struct repeating_timer *t)
   PWM_Instance[7]->setPWM_manual_Fast(PWM_Pins[7], dc_levels[7]);
   PWM_Instance[8]->setPWM_manual_Fast(PWM_Pins[8], dc_levels[8]);
   PWM_Instance[9]->setPWM_manual_Fast(PWM_Pins[9], dc_levels[9]);
-  PWM_Instance[10]->setPWM_manual_Fast(PWM_Pins[10], dc_levels[10]);
-  PWM_Instance[11]->setPWM_manual_Fast(PWM_Pins[11], dc_levels[11]);
 
   //xSemaphoreTake(interruptSemaphore, portMAX_DELAY);
   //xSemaphoreTake(mutex_v, portMAX_DELAY);
@@ -287,7 +264,6 @@ void pwm_setup(void)
   angle2res(T_FINE,pwm_synchro);
   angle2res(T_MEDIUM,pwm_synchro);
   angle2res(T_COARSE,pwm_synchro);
-  angle2res(T_REFERENCE,pwm_reference);
   angle2res(T_HEADING,pwm_synchro);
   angle2res(T_NtoS,pwm_synchro);
 
@@ -339,22 +315,43 @@ void printPWMInfo(RP2040_PWM* PWM_Instance)
 
 //  delay(100);
 }
+extern float disp_lhs,disp_rhs;
 
 void angle2res(int channel, byte config, float value/*=NAN*/, float bump/*=0*/) {
   float target;
 
   switch(config){
+    
     case pwm_resolver:
     // output to resolver receiver
     if(value!=value)
       value=transport.resolvers[channel].angle;
     value = fmod(value + bump, 360);
     transport.resolvers[channel].angle = value;
+
     target = fmod(transport.resolvers[channel].angle, 360) * M_PI / 180.0;
     transport.resolvers[channel].amplitude[0] = sin(target) * 500;
     transport.resolvers[channel].amplitude[1] = cos(target) * 500;
     break;
 
+  
+    case dac_resolver:
+    // output to MDAC resolver 
+    if(channel<3)
+    {
+      if(value!=value)
+        value=transport.resolvers[channel].angle;
+      value = fmod(value + bump, 360);
+      transport.resolvers[channel].angle = value;
+
+      target = fmod(transport.resolvers[channel].angle, 360) * M_PI / 180.0;
+      *channels[channel][0] = 2048 + sin(target) * 2047.0;
+      *channels[channel][1] = 2048 + cos(target) * 2047.0;
+      SPI_update(spi_msg, channel, *channels[channel][0], *channels[channel][1] );
+      SPI_write();
+    }
+    break;
+  
     case pwm_synchro:
     // output to synchro receiver
     if(value!=value)

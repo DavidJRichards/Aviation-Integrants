@@ -43,6 +43,7 @@ The software relies heavily on pre-built Arduino libraries, The main ones used a
 |TM1637      |   |
 |ADCInput    |   |
 |Arinc429    |   |
+|MAX532      |   |
 
 Master using ESP32 CYD tft touch display
 
@@ -85,7 +86,9 @@ The configuration menu is editable using the system rotary encoder, the menu pro
 
 ### Outputs
 
-16 400 Hz variable purpose drives
+10 400 Hz variable purpose drives
+
+6 400 Hz MAX 523 resolver output drivers
 
 16 DC DAC drives
 
@@ -187,6 +190,7 @@ Each channel is configured using one of 12 parameter sets, giving access to:
 |Sine_ChA |     |     |
 |Sine_ChB |     |     |
 |Reference|     |     |
+|Resolver DAC|  |     |
 
 ## Input sources
 

@@ -576,7 +576,7 @@
     {
       "parentId": 34,
       "type": "enumItem",
-      "defaultValue": "4",
+      "defaultValue": "1",
       "item": {
         "enumEntries": [
           "Default",
@@ -645,7 +645,7 @@
     {
       "parentId": 34,
       "type": "enumItem",
-      "defaultValue": "5",
+      "defaultValue": "1",
       "item": {
         "enumEntries": [
           "Default",
@@ -714,7 +714,7 @@
     {
       "parentId": 34,
       "type": "enumItem",
-      "defaultValue": "6",
+      "defaultValue": "1",
       "item": {
         "enumEntries": [
           "Default",
@@ -783,7 +783,7 @@
     {
       "parentId": 34,
       "type": "enumItem",
-      "defaultValue": "2",
+      "defaultValue": "1",
       "item": {
         "enumEntries": [
           "Default",
@@ -852,7 +852,7 @@
     {
       "parentId": 34,
       "type": "enumItem",
-      "defaultValue": "3",
+      "defaultValue": "1",
       "item": {
         "enumEntries": [
           "Default",
@@ -2991,7 +2991,7 @@
     {
       "parentId": 57,
       "type": "enumItem",
-      "defaultValue": "1",
+      "defaultValue": "2",
       "item": {
         "enumEntries": [
           "Disabled",
@@ -2999,7 +2999,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH0",
         "variableName": "PWMConfigCH0",
@@ -3014,7 +3015,7 @@
     {
       "parentId": 57,
       "type": "enumItem",
-      "defaultValue": "1",
+      "defaultValue": "2",
       "item": {
         "enumEntries": [
           "Disabled",
@@ -3022,7 +3023,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH1",
         "variableName": "PWMConfigCH1",
@@ -3037,7 +3039,7 @@
     {
       "parentId": 57,
       "type": "enumItem",
-      "defaultValue": "1",
+      "defaultValue": "2",
       "item": {
         "enumEntries": [
           "Disabled",
@@ -3045,7 +3047,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH2",
         "variableName": "PWMConfigCH2",
@@ -3060,7 +3063,7 @@
     {
       "parentId": 57,
       "type": "enumItem",
-      "defaultValue": "5",
+      "defaultValue": "2",
       "item": {
         "enumEntries": [
           "Disabled",
@@ -3068,7 +3071,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH3",
         "variableName": "PWMConfigCH3",
@@ -3083,7 +3087,7 @@
     {
       "parentId": 57,
       "type": "enumItem",
-      "defaultValue": "1",
+      "defaultValue": "2",
       "item": {
         "enumEntries": [
           "Disabled",
@@ -3091,7 +3095,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH4",
         "variableName": "PWMConfigCH4",
@@ -3106,7 +3111,7 @@
     {
       "parentId": 57,
       "type": "enumItem",
-      "defaultValue": "1",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Disabled",
@@ -3114,7 +3119,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH5",
         "variableName": "PWMConfigCH5",
@@ -3137,7 +3143,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH6",
         "variableName": "PWMConfigCH6",
@@ -3160,7 +3167,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH7",
         "variableName": "PWMConfigCH7",
@@ -3183,7 +3191,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH8",
         "variableName": "PWMConfigCH8",
@@ -3206,7 +3215,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH9",
         "variableName": "PWMConfigCH9",
@@ -3229,7 +3239,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH10",
         "variableName": "PWMConfigCH10",
@@ -3252,7 +3263,8 @@
           "Resolver",
           "Sine_ChA",
           "Sine_ChB",
-          "Reference"
+          "Reference",
+          "DAC Resolver"
         ],
         "name": "PWM_Config_CH11",
         "variableName": "PWMConfigCH11",
@@ -3757,6 +3769,22 @@
       "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 3,
+        "name": "PWM11",
+        "variableName": "PWM11",
+        "id": 98,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "floatItem",
+      "defaultValue": "0.0",
+      "item": {
+        "numDecimalPlaces": 3,
         "name": "PWM8",
         "variableName": "PWM8",
         "id": 95,
@@ -3792,22 +3820,6 @@
         "name": "PWM10",
         "variableName": "PWM10",
         "id": 97,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "floatItem",
-      "defaultValue": "0.0",
-      "item": {
-        "numDecimalPlaces": 3,
-        "name": "PWM11",
-        "variableName": "PWM11",
-        "id": 98,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -4062,8 +4074,8 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C16",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "mcp23017:iox:32:35",
-      "deviceIO:"
+      "deviceIO:",
+      "mcp23017:iox:32:35"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

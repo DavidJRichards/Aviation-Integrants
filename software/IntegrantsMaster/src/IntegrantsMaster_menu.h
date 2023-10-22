@@ -18,8 +18,8 @@
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
-#include <IoAbstractionWire.h>
 #include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
 #include <EepromItemStorage.h>
 #include <EepromAbstractionWire.h>
 
@@ -38,10 +38,10 @@ extern IoAbstractionRef ioexp_iox;
 // Global Menu Item exports
 extern AnalogMenuItem menuPhaseOffset;
 extern AnalogMenuItem menuRmsNominal;
-extern FloatMenuItem menuPWM11;
 extern FloatMenuItem menuPWM10;
 extern FloatMenuItem menuPWM9;
 extern FloatMenuItem menuPWM8;
+extern FloatMenuItem menuPWM11;
 extern FloatMenuItem menuPWM7;
 extern FloatMenuItem menuPWM6;
 extern FloatMenuItem menuPWM5;

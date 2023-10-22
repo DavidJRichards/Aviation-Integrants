@@ -1,4 +1,4 @@
-#define PIN_Hi_429   13 //7
+#define PIN_Hi_429   14 //13 //7
 #define PIN_Lo_429   22 //10
 #define PIN_Debug   LED_BUILTIN
 

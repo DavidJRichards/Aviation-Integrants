@@ -34,6 +34,80 @@ char dspbuf[12];
 #endif
 float disp_lhs,disp_rhs;
 
+#define USE_MAX532
+#ifdef USE_MAX532
+const int slaveSelectPin  = 13;
+const int SPI1_MOSI       = 11;
+const int SPI1_MISO       = 12;
+const int SPI1_SCK        = 10;
+
+uint16_t channel_B=0x555;
+uint16_t channel_A=0xAAA;
+uint16_t channel_D;
+uint16_t channel_C;
+uint16_t channel_F;
+uint16_t channel_E;
+
+byte spi_msg[9];
+uint16_t* channels[3][2]=
+{
+    {&channel_A, &channel_B},
+    {&channel_C, &channel_D},
+    {&channel_E, &channel_F},
+};
+
+
+#define SPI_BITRATE 100000 // 1M also ok
+SPISettings setMAX532(SPI_BITRATE, MSBFIRST, SPI_MODE0);
+
+void SPI_setup(void)
+{
+  pinMode(slaveSelectPin, OUTPUT);
+  SPI1.setSCK(SPI1_SCK);
+  SPI1.setCS(slaveSelectPin);
+  SPI1.setRX(SPI1_MISO);
+  SPI1.setTX(SPI1_MOSI);
+  SPI1.begin(false);
+}
+
+void SPI_update(byte* pmsg, int index, uint16_t chan1, uint16_t chan2)
+{ 
+  index = index * 3;
+  pmsg[index+0] = (byte) (   chan2 >> 4);
+  pmsg[index+1] = (byte) ( ( chan2 << 4 ) | ( chan1 >> 8 ));
+  pmsg[index+2] = (byte) (   chan1 & 0xFF);
+}
+
+
+void SPI_write(void) 
+{
+#if 0
+  SPI_update(spi_msg, 0, channel_A, channel_B);
+  SPI_update(spi_msg, 1, channel_C, channel_D);
+  SPI_update(spi_msg, 2, channel_E, channel_F);
+//#else
+  msg[0] = (byte) (   channel_B >> 4);
+  msg[1] = (byte) ( ( channel_B << 4 ) | ( channel_A >> 8 ));
+  msg[2] = (byte) (   channel_A & 0xFF);
+
+  msg[3] = (byte) (   channel_D >> 4);
+  msg[4] = (byte) ( ( channel_D << 4 ) | ( channel_C >> 8 ));
+  msg[5] = (byte) (   channel_C & 0xFF);
+
+  msg[6] = (byte) (   channel_F >> 4);
+  msg[7] = (byte) ( ( channel_F << 4 ) | ( channel_E >> 8 ));
+  msg[8] = (byte) (   channel_E & 0xFF);
+#endif
+  SPI1.beginTransaction(setMAX532);
+  digitalWrite(slaveSelectPin, LOW);
+  SPI1.transfer(spi_msg, sizeof(spi_msg));
+  SPI1.endTransaction();
+  digitalWrite(slaveSelectPin, HIGH);
+
+}
+#endif // USE_MAX532
+
+
 
 uint32_t target2_Time = 0;    // millis value for next display event
 char dashLine[] = "=====================================================================";
@@ -80,6 +154,10 @@ void setup() {
   #ifdef USE_ADC1
   adc_setup();
   #endif  
+
+  #ifdef USE_MAX532
+  SPI_setup();
+  #endif
 
   target2_Time = millis() + 1000; 
   Serial.println("setup A finished");
@@ -149,6 +227,11 @@ void loop() {
   if(target2_Time < millis() )
   {
     target2_Time += 200;
+
+#ifdef USE_MAX532
+//    SPI_write();
+#endif
+
 #ifdef SEG7DSP
     sprintf(dspbuf,"%-4.0f%4.0f",disp_lhs,disp_rhs);
     dsp.stg( dspbuf );
