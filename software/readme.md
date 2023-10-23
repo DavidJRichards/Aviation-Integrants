@@ -49,13 +49,13 @@ The software relies heavily on pre-built Arduino libraries, The main ones used a
 
 Master using ESP32 CYD tft touch display
 
-[Integrants I2C master](./CYD_I2C_master)
+[Integrants I2C master](./IntegrantsMaster)
 
-Client using RP2040 PWM generators
+Client using RP2040 PWM & MAX532 generators
 
-[Integrants I2C client](./MULTI_I2C_client)
+[Integrants I2C client](./IntegrantsClient)
 
-Latest version of sensor and driver software integration using TcMenu 
+A version of sensor and driver software integration using TcMenu
 
 ![TcMenu](../images/TcMenuExample.jpg)
 
@@ -88,11 +88,11 @@ The configuration menu is editable using the system rotary encoder, the menu pro
 
 ### Outputs
 
-10 400 Hz variable purpose drives
+10 400 Hz variable purpose drives (synchro, resolver, etc)
 
-6 400 Hz MAX 523 resolver output drivers
+6 400 Hz MAX 523 resolver output drivers(better precision for moving map)
 
-16 DC DAC drives
+16 DC DAC drives 
 
 8 LED Indicators
 
@@ -102,7 +102,7 @@ Single Arinc429 transmitter
 
 ### Inputs
 
-Rotary encoder manual
+Rotary encoder manual with press and two external buttons
 
 Synchro Receiver ADC with angle decode
 
