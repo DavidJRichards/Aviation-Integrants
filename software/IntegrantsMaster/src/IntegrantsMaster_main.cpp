@@ -156,6 +156,7 @@ typedef struct  {
   float adc_angle;      //  4
                         //------
                         // 16
+  byte padding[32];
 } t_I2cRxStruct;
 
 // client I2C address
@@ -165,6 +166,7 @@ t_I2cRxStruct rxData;
 bool rqData = false;
 bool newRxData = false;
 bool newTxData = false;
+bool i2cBusy = false;
 
 
 const char* pload0="multi-line payload hex dumper which should split over several lines, with some left over";
@@ -548,8 +550,9 @@ float readChannel(ADS1115_MUX channel) {
 
 void transmitData() {
 
-  if (newTxData == true) {
+  if (newTxData == true && i2cBusy==false) {
   //  Serial.printf("sizeoftx %d\n\r",sizeof(txData));
+    i2cBusy = true;
     Wire.beginTransmission(otherAddress);
     Wire.write((byte*)&txData, sizeof(txData));
     Wire.endTransmission();  // this is what actually sends the data
@@ -567,6 +570,7 @@ void requestData() {
     Wire.readBytes((byte*)&rxData, numBytes);
     newRxData = true;
     rqData = false;
+    i2cBusy = false;
   }
 }
 
@@ -911,44 +915,44 @@ void loop() {
 // update data values from menu (should rewrite to callback on change where possible)
 
 // pwm type config
-    txData.channels[0].config=menuPWMConfigCH0.getCurrentValue();
-    txData.channels[1].config=menuPWMConfigCH1.getCurrentValue();
-    txData.channels[2].config=menuPWMConfigCH2.getCurrentValue();
-    txData.channels[3].config=menuPWMConfigCH3.getCurrentValue();
-    txData.channels[4].config=menuPWMConfigCH4.getCurrentValue();
-    txData.channels[5].config=menuPWMConfigCH5.getCurrentValue();
-    txData.channels[6].config=menuPWMConfigCH6.getCurrentValue();
-    txData.channels[7].config=menuPWMConfigCH7.getCurrentValue();
-    txData.channels[8].config=menuPWMConfigCH8.getCurrentValue();
-    txData.channels[9].config=menuPWMConfigCH9.getCurrentValue();
+    txData.channels[0].config = menuPWMConfigCH0.getCurrentValue();
+    txData.channels[1].config = menuPWMConfigCH1.getCurrentValue();
+    txData.channels[2].config = menuPWMConfigCH2.getCurrentValue();
+    txData.channels[3].config = menuPWMConfigCH3.getCurrentValue();
+    txData.channels[4].config = menuPWMConfigCH4.getCurrentValue();
+    txData.channels[5].config = menuPWMConfigCH5.getCurrentValue();
+    txData.channels[6].config = menuPWMConfigCH6.getCurrentValue();
+    txData.channels[7].config = menuPWMConfigCH7.getCurrentValue();
+    txData.channels[8].config = menuPWMConfigCH8.getCurrentValue();
+    txData.channels[9].config = menuPWMConfigCH9.getCurrentValue();
     txData.channels[10].config=menuPWMConfigCH10.getCurrentValue();
     txData.channels[11].config=menuPWMConfigCH11.getCurrentValue();
       
 // pwm channel channel      
-    txData.channels[0].channel=menuPWMChannelCH0.getCurrentValue();
-    txData.channels[1].channel=menuPWMChannelCH1.getCurrentValue();
-    txData.channels[2].channel=menuPWMChannelCH2.getCurrentValue();
-    txData.channels[3].channel=menuPWMChannelCH3.getCurrentValue();
-    txData.channels[4].channel=menuPWMChannelCH4.getCurrentValue();
-    txData.channels[5].channel=menuPWMChannelCH5.getCurrentValue();
-    txData.channels[6].channel=menuPWMChannelCH6.getCurrentValue();
-    txData.channels[7].channel=menuPWMChannelCH7.getCurrentValue();
-    txData.channels[8].channel=menuPWMChannelCH8.getCurrentValue();
-    txData.channels[9].channel=menuPWMChannelCH9.getCurrentValue();
+    txData.channels[0].channel = menuPWMChannelCH0.getCurrentValue();
+    txData.channels[1].channel = menuPWMChannelCH1.getCurrentValue();
+    txData.channels[2].channel = menuPWMChannelCH2.getCurrentValue();
+    txData.channels[3].channel = menuPWMChannelCH3.getCurrentValue();
+    txData.channels[4].channel = menuPWMChannelCH4.getCurrentValue();
+    txData.channels[5].channel = menuPWMChannelCH5.getCurrentValue();
+    txData.channels[6].channel = menuPWMChannelCH6.getCurrentValue();
+    txData.channels[7].channel = menuPWMChannelCH7.getCurrentValue();
+    txData.channels[8].channel = menuPWMChannelCH8.getCurrentValue();
+    txData.channels[9].channel = menuPWMChannelCH9.getCurrentValue();
     txData.channels[10].channel=menuPWMChannelCH10.getCurrentValue();
     txData.channels[11].channel=menuPWMChannelCH11.getCurrentValue();
 
 // pwm voltage config
-    txData.channels[0].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
-    txData.channels[1].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
-    txData.channels[2].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
-    txData.channels[3].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
-    txData.channels[4].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
-    txData.channels[5].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
-    txData.channels[6].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
-    txData.channels[7].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
-    txData.channels[8].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
-    txData.channels[9].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[0].amplitude =menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[1].amplitude =menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[2].amplitude =menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[3].amplitude =menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[4].amplitude =menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[5].amplitude =menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[6].amplitude =menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[7].amplitude =menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[8].amplitude =menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+    txData.channels[9].amplitude =menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
     txData.channels[10].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
     txData.channels[11].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
 
@@ -1003,23 +1007,23 @@ void loop() {
     menuADC2Voltage.setFloatValue(voltage_2_3);
 
 // display of PWM angles values sent to I2C client
-    menuPWM0.setFloatValue(txData.channels[0].value);
-    menuPWM1.setFloatValue(txData.channels[1].value);
-    menuPWM2.setFloatValue(txData.channels[2].value);
-    menuPWM3.setFloatValue(txData.channels[3].value);
-    menuPWM4.setFloatValue(txData.channels[4].value);
-    menuPWM5.setFloatValue(txData.channels[5].value);
-    menuPWM6.setFloatValue(txData.channels[6].value);
-    menuPWM7.setFloatValue(txData.channels[7].value);
-    menuPWM8.setFloatValue(txData.channels[8].value);
-    menuPWM9.setFloatValue(txData.channels[9].value);
+    menuPWM0.setFloatValue( txData.channels[0].value);
+    menuPWM1.setFloatValue( txData.channels[1].value);
+    menuPWM2.setFloatValue( txData.channels[2].value);
+    menuPWM3.setFloatValue( txData.channels[3].value);
+    menuPWM4.setFloatValue( txData.channels[4].value);
+    menuPWM5.setFloatValue( txData.channels[5].value);
+    menuPWM6.setFloatValue( txData.channels[6].value);
+    menuPWM7.setFloatValue( txData.channels[7].value);
+    menuPWM8.setFloatValue( txData.channels[8].value);
+    menuPWM9.setFloatValue( txData.channels[9].value);
     menuPWM10.setFloatValue(txData.channels[10].value);
     menuPWM11.setFloatValue(txData.channels[11].value);
 
 
   } // end if target1 time
 
-  if(newTxData)
+  if(newTxData & ! i2cBusy)
   {
     update_pwm_angles();
     transmitData();
@@ -1055,6 +1059,7 @@ void CALLBACK_FUNCTION eeprom_save(int id) {
 
 void CALLBACK_FUNCTION cb_encoder(int id) {
   encoder_pos=menuEncoder.getCurrentValue()-2048;
+  newTxData = true;
 }
 
 

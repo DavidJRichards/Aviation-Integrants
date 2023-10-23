@@ -56,6 +56,9 @@ uint16_t* channels[3][2]=
     {&channel_E, &channel_F},
 };
 
+float resolver_DAC_angles[3];
+
+bool newDACdata = false;
 
 #define SPI_BITRATE 100000 // 1M also ok
 SPISettings setMAX532(SPI_BITRATE, MSBFIRST, SPI_MODE0);
@@ -81,32 +84,27 @@ void SPI_update(byte* pmsg, int index, uint16_t chan1, uint16_t chan2)
 
 void SPI_write(void) 
 {
-#if 0
-  SPI_update(spi_msg, 0, channel_A, channel_B);
-  SPI_update(spi_msg, 1, channel_C, channel_D);
-  SPI_update(spi_msg, 2, channel_E, channel_F);
-//#else
-  msg[0] = (byte) (   channel_B >> 4);
-  msg[1] = (byte) ( ( channel_B << 4 ) | ( channel_A >> 8 ));
-  msg[2] = (byte) (   channel_A & 0xFF);
-
-  msg[3] = (byte) (   channel_D >> 4);
-  msg[4] = (byte) ( ( channel_D << 4 ) | ( channel_C >> 8 ));
-  msg[5] = (byte) (   channel_C & 0xFF);
-
-  msg[6] = (byte) (   channel_F >> 4);
-  msg[7] = (byte) ( ( channel_F << 4 ) | ( channel_E >> 8 ));
-  msg[8] = (byte) (   channel_E & 0xFF);
-#endif
   SPI1.beginTransaction(setMAX532);
   digitalWrite(slaveSelectPin, LOW);
   SPI1.transfer(spi_msg, sizeof(spi_msg));
   SPI1.endTransaction();
   digitalWrite(slaveSelectPin, HIGH);
-
 }
-#endif // USE_MAX532
 
+
+void SPI_process(void)
+{
+  if(newDACdata)
+  {
+    static bool led_blink=false;
+    led_blink = !led_blink;
+    digitalWrite(LED_BUILTIN, led_blink);
+    SPI_write();
+    newDACdata=false;
+  }
+}
+
+#endif // USE_MAX532
 
 
 uint32_t target2_Time = 0;    // millis value for next display event
@@ -224,13 +222,14 @@ void loop() {
   adc_loop();
   #endif
 
+#ifdef USE_MAX532
+  SPI_process();
+#endif
+
   if(target2_Time < millis() )
   {
     target2_Time += 200;
 
-#ifdef USE_MAX532
-//    SPI_write();
-#endif
 
 #ifdef SEG7DSP
     sprintf(dspbuf,"%-4.0f%4.0f",disp_lhs,disp_rhs);

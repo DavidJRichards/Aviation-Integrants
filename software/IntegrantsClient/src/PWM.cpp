@@ -323,64 +323,66 @@ void angle2res(int channel, byte config, float value/*=NAN*/, float bump/*=0*/) 
   switch(config){
     
     case pwm_resolver:
-    // output to resolver receiver
-    if(value!=value)
-      value=transport.resolvers[channel].angle;
-    value = fmod(value + bump, 360);
-    transport.resolvers[channel].angle = value;
-
-    target = fmod(transport.resolvers[channel].angle, 360) * M_PI / 180.0;
-    transport.resolvers[channel].amplitude[0] = sin(target) * 500;
-    transport.resolvers[channel].amplitude[1] = cos(target) * 500;
-    break;
-
-  
-    case dac_resolver:
-    // output to MDAC resolver 
-    if(channel<3)
-    {
+      // output to resolver receiver
       if(value!=value)
         value=transport.resolvers[channel].angle;
       value = fmod(value + bump, 360);
       transport.resolvers[channel].angle = value;
 
       target = fmod(transport.resolvers[channel].angle, 360) * M_PI / 180.0;
-      *channels[channel][0] = 2048 + sin(target) * 2047.0;
-      *channels[channel][1] = 2048 + cos(target) * 2047.0;
-      SPI_update(spi_msg, channel, *channels[channel][0], *channels[channel][1] );
-      SPI_write();
-    }
+      transport.resolvers[channel].amplitude[0] = sin(target) * 500;
+      transport.resolvers[channel].amplitude[1] = cos(target) * 500;
+    break;
+
+  
+    case dac_resolver:
+      // output to MDAC resolver 
+      if(channel<3)
+      {
+        if(value!=value)
+          value=resolver_DAC_angles[channel];
+        value = fmod(value + bump, 360);
+        if(value != resolver_DAC_angles[channel])
+        {
+          resolver_DAC_angles[channel] = value;
+          target = fmod(resolver_DAC_angles[channel], 360) * M_PI / 180.0;
+          *channels[channel][0] = 2048 + sin(target) * 2047.0;
+          *channels[channel][1] = 2048 + cos(target) * 2047.0;
+          SPI_update(spi_msg, channel, *channels[channel][0], *channels[channel][1] );
+          newDACdata = true;
+        }
+      }
     break;
   
     case pwm_synchro:
-    // output to synchro receiver
-    if(value!=value)
-      value=transport.resolvers[channel].angle;
-    value = fmod(value + bump, 360);
-    transport.resolvers[channel].angle = value;
-    target = fmod(transport.resolvers[channel].angle + 120, 360) * M_PI / 180.0;
-    transport.resolvers[channel].amplitude[0] = sin(target) * 500;
+      // output to synchro receiver
+      if(value!=value)
+        value=transport.resolvers[channel].angle;
+      value = fmod(value + bump, 360);
+      transport.resolvers[channel].angle = value;
+      target = fmod(transport.resolvers[channel].angle + 120, 360) * M_PI / 180.0;
+      transport.resolvers[channel].amplitude[0] = sin(target) * 500;
 
-    target = -fmod(transport.resolvers[channel].angle + 240, 360) * M_PI / 180.0;
-    transport.resolvers[channel].amplitude[1] = sin(target) * 500;
+      target = -fmod(transport.resolvers[channel].angle + 240, 360) * M_PI / 180.0;
+      transport.resolvers[channel].amplitude[1] = sin(target) * 500;
     break;
 
     case pwm_sineCha:
-    // output to first half of synchro pair
-    target = fmod(value, 360) * M_PI/180.0;
-    transport.resolvers[channel].amplitude[0] = sin(target) * 500;
+      // output to first half of synchro pair
+      target = fmod(value, 360) * M_PI/180.0;
+      transport.resolvers[channel].amplitude[0] = sin(target) * 500;
     break;
 
     case pwm_sineChb:
-    // outout to 2nd half of synchro pair
-    target = fmod(value, 360) * M_PI/180.0;
-    transport.resolvers[channel].amplitude[1] = sin(target) * 500;
+      // outout to 2nd half of synchro pair
+      target = fmod(value, 360) * M_PI/180.0;
+      transport.resolvers[channel].amplitude[1] = sin(target) * 500;
     break;
 
     case pwm_reference:
-    // reference
-    transport.resolvers[channel].amplitude[0] = 500.0;
-    transport.resolvers[channel].amplitude[1] = -500.0;
+      // reference
+      transport.resolvers[channel].amplitude[0] = 500.0;
+      transport.resolvers[channel].amplitude[1] = -500.0;
     break;
 
     default:
