@@ -84,9 +84,6 @@ extern EnumMenuItem menuPWMConfigCH1;
 extern EnumMenuItem menuPWMConfigCH0;
 extern BackMenuItem menuBackSynchroConfig;
 extern SubMenuItem menuSynchroConfig;
-extern FloatMenuItem menuCalRatio2;
-extern EditableLargeNumberMenuItem menuMapRatio1;
-extern EditableLargeNumberMenuItem menuMapRatio0;
 extern EnumMenuInfo minfoLED8;
 extern EnumMenuItem menuLED8;
 extern EnumMenuInfo minfoLED7;
@@ -176,8 +173,12 @@ extern ActionMenuItem menuEepromLoad;
 extern ActionMenuItem menuEepromSave;
 extern BackMenuItem menuBackEEPROMData;
 extern SubMenuItem menuEEPROMData;
+extern AnalogMenuItem menuScale1;
+extern AnalogMenuItem menuScale0;
+extern EditableLargeNumberMenuItem menuMapRatio1;
+extern EditableLargeNumberMenuItem menuMapRatio0;
+extern FloatMenuItem menuCalRatio2;
 extern FloatMenuItem menuSynchroAngle;
-extern AnalogMenuItem menuMapHeading;
 extern AnalogMenuItem menuMAPCoarse;
 extern FloatMenuItem menuMapCoarse;
 extern AnalogMenuItem menuMAPMedium;
@@ -185,12 +186,13 @@ extern FloatMenuItem menuMapMedium;
 extern AnalogMenuItem menuMAPFine;
 extern FloatMenuItem menuMapFine;
 extern EditableLargeNumberMenuItem menuMapAbsolute;
-extern AnalogMenuItem menuEncoder;
-extern AnalogMenuItem menuMapNtoS;
 extern AnalogMenuItem menuMapPosition;
+extern AnalogMenuItem menuMapNtoS;
+extern AnalogMenuItem menuMapHeading;
+extern AnalogMenuItem menuEncoder;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuMapPosition; }
+inline MenuItem& rootMenuItem() { return menuEncoder; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
@@ -206,6 +208,7 @@ void CALLBACK_FUNCTION cb_ntos(int id);
 void CALLBACK_FUNCTION cb_phase(int id);
 void CALLBACK_FUNCTION cb_position(int id);
 void CALLBACK_FUNCTION cb_ratio(int id);
+void CALLBACK_FUNCTION cb_scale(int id);
 void CALLBACK_FUNCTION cb_voltage(int id);
 void CALLBACK_FUNCTION eeprom_load(int id);
 void CALLBACK_FUNCTION eeprom_save(int id);

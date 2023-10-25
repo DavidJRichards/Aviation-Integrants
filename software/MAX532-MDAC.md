@@ -14,8 +14,16 @@ Here is a picture of the prototype MDAC board, it uses the bipolar configuration
 ### Prototype board
 
 ![WoVO8jZVJFkNUcRo](../images/WoVO8jZVJFkNUcRo.png)
+![IMG_20231025_192352](../images/IMG_20231025_192352.jpg)
 
 RP2040 communicates with the MAX532 chips using SPI protocol, a cingle chip enable is used to strobe all three signals together.
+
+### RP2040 test board
+
+This was used to test the MDAC board prior to incorporation in the main system as an I2C client.
+The menu settings are used directley by the SPI writing functions.
+
+![IMG_20231025_194250](../images/IMG_20231025_194250.jpg)
 
 ### Example Logic Analyser trace.
 

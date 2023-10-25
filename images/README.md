@@ -33,6 +33,16 @@ IMG_20230807_195858.jpg
 </td>
 
 <td valign="bottom">
+<img src="./IMG_20231025_192352.jpg" width="200"><br>
+IMG_20231025_192352.jpg
+</td>
+
+<td valign="bottom">
+<img src="./IMG_20231025_194250.jpg" width="200"><br>
+IMG_20231025_194250.jpg
+</td>
+
+<td valign="bottom">
 <img src="./MAX532BipolarOperation.png" width="200"><br>
 MAX532BipolarOperation.png
 </td>
@@ -42,6 +52,8 @@ MAX532BipolarOperation.png
 MAX532DaisyChain.png
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./MAX532ReferenceBuffer.jpg" width="200"><br>
 MAX532ReferenceBuffer.jpg
@@ -52,8 +64,6 @@ MAX532ReferenceBuffer.jpg
 MQTT_NodeRed.png
 </td>
 
-</tr>
-<tr>
 <td valign="bottom">
 <img src="./MX3aqjlUMAeUUY2H.png" width="200"><br>
 MX3aqjlUMAeUUY2H.png
@@ -69,6 +79,8 @@ OyH3q0k1a7W0Y7W8.png
 TcMenuExample.jpg
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./WoVO8jZVJFkNUcRo.png" width="200"><br>
 WoVO8jZVJFkNUcRo.png

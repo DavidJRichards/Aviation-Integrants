@@ -1067,6 +1067,7 @@ void CALLBACK_FUNCTION cb_ratio(int id) {
   ratio0 = menuMapRatio0.getLargeNumber()->getAsFloat();
   ratio1 = menuMapRatio1.getLargeNumber()->getAsFloat();
   ratio2 = ratio0 * ratio1;
+  menuCalRatio2.setFloatValue(ratio2);
   abs2res(absolute);
 }
 
@@ -1119,4 +1120,12 @@ void CALLBACK_FUNCTION cb_fine(int id) {
   newTxData = true;
 }
 
+
+void CALLBACK_FUNCTION cb_scale(int id) {
+  ratio0 = menuScale0.getCurrentValue() / 100.0;
+  ratio1 = menuScale1.getCurrentValue() / 100.0;
+  ratio2 = ratio0 * ratio1;
+  menuCalRatio2.setFloatValue(ratio2);
+  abs2res(absolute);
+}
 //end.
