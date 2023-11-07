@@ -1,8 +1,21 @@
 # Aviation-Integrants
 Modular microprocessor circuits for exercising aviation instruments
 
+## Modules
 
-## [Photos](./images)
+[Control Menu](./software/readme.md)
+
+[MAX532-MDAC](./hardware/MAX532-MDAC.md)
+
+[PCA9685-PWM-Power](./hardware/PCA9685-PWM-Power.md)
+
+[ADS1115-ADC](./hardware/ADS1115-ADC.md)
+
+[TDA7294-Amp](./hardware/TDA7294-Amp.md)
+
+[LM1875-Amp](./hardware/LM1875-Amp.md)
+
+## [Photos](./images/README.md)
 
 ## [Integrants Software](./software)
 
