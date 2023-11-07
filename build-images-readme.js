@@ -5,7 +5,7 @@ const path = require('path');
 
 const ROOT_DIR = '/home/david/Github/Aviation-Integrants/images';
 const README_FILENAME = 'README.md';
-const NB_IMAGES_PER_LINE = 5;
+const NB_IMAGES_PER_LINE = 4;
 let nbImages = 0;
 let mdContent = '<table><tr>';
 

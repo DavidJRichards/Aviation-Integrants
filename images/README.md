@@ -20,13 +20,13 @@ DemoLHS.jpg
 DemoRHS.jpg
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./IMG_20230801_204251.jpg" width="200"><br>
 IMG_20230801_204251.jpg
 </td>
 
-</tr>
-<tr>
 <td valign="bottom">
 <img src="./IMG_20230802_115135.jpg" width="200"><br>
 IMG_20230802_115135.jpg
@@ -42,6 +42,8 @@ IMG_20230802_123456.jpg
 IMG_20230807_195858.jpg
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./IMG_20231025_192352.jpg" width="200"><br>
 IMG_20231025_192352.jpg
@@ -52,8 +54,6 @@ IMG_20231025_192352.jpg
 IMG_20231025_194250.jpg
 </td>
 
-</tr>
-<tr>
 <td valign="bottom">
 <img src="./LM1875-Amp.jpg" width="200"><br>
 LM1875-Amp.jpg
@@ -64,6 +64,8 @@ LM1875-Amp.jpg
 LM1875-Schematic.png
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./MAX532BipolarOperation.png" width="200"><br>
 MAX532BipolarOperation.png
@@ -79,13 +81,13 @@ MAX532DaisyChain.png
 MAX532ReferenceBuffer.jpg
 </td>
 
-</tr>
-<tr>
 <td valign="bottom">
 <img src="./MQTT_NodeRed.png" width="200"><br>
 MQTT_NodeRed.png
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./MX3aqjlUMAeUUY2H.png" width="200"><br>
 MX3aqjlUMAeUUY2H.png
