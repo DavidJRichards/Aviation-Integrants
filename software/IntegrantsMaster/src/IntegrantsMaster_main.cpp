@@ -61,6 +61,10 @@ const int attachedInterruptPin = 35;
 MCP23017IoAbstraction mcp23017(0x20, ACTIVE_LOW_OPEN,  attachedInterruptPin, IO_PIN_NOT_DEFINED);
 //MCP23017IoAbstraction mcp23017(0x20, ACTIVE_LOW_OPEN, IO_PIN_NOT_DEFINED);
 
+#ifndef SCREENSERVER_FILENAME
+  #define SCREENSERVER_FILENAME "tft_screenshots/screenshot"
+#endif
+extern bool screenServer(String filename);
 
 #ifdef USE_I2C_DIPSW
 #include <MCP23017.h>
@@ -905,12 +909,17 @@ void loop() {
 
   taskManager.runLoop();
 
-  if (target1_time < millis() ) {
+  if (target1_time < millis() ) 
+  {
     target1_time += 500;
   
 // I2C send and receive to slave Pico2040 PWM generator  
     newTxData = true;
-    // pwm angles calculated below ...
+
+// process request for screen capture
+    screenServer(SCREENSERVER_FILENAME);
+
+// pwm angles calculated below ...
 
 // update data values from menu (should rewrite to callback on change where possible)
 
