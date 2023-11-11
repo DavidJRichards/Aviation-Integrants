@@ -3,3 +3,6 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+doxygen/html
+processing/tft_screenshots
+processing/*.png
