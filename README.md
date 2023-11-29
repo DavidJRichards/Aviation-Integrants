@@ -15,6 +15,14 @@ Modular microprocessor circuits for exercising aviation instruments
 
 [LM1875-Amp](./hardware/LM1875-Amp.md)
 
+## Videos
+
+[#1 Aviation Integrants Introduction](https://youtu.be/Xt561YlcXEw)
+
+[Aviation Integrants 400 Hz PWM](https://youtu.be/oUfFnTuM4sA)
+
+[Aviation Integrants flight demo](https://youtu.be/FEqSL34pKfE)
+
 ## [Photos](./images/README.md)
 
 ## [Integrants Software](./software)
