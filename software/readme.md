@@ -177,22 +177,72 @@ Absolute map position
 There are 16 PWM channels normally arranged in pairs to drive amplifiers to simulate synchro or resolvers or other 400 Hz signals.
 
 Each channel is configured using one of 12 parameter sets, giving access to:
- * Function
- * Data source
- * Rotation angle
- * Maximum amplitude
- 
-### Functions available
+ * Function - includes data representation and output hardware selection
+ * Data source - input channel data is aquired from
+ * Rotation angle - the main dynamic data
+ * Maximum amplitude - scaling value for data
 
-|Function |     |     |
-|---------|-----|-----|
-|Disabled |     |     |
-|Synchro  |     |     |
-|Resolver |     |     |
-|Sine_ChA |     |     |
-|Sine_ChB |     |     |
-|Reference|     |     |
-|Resolver DAC|  |     |
+### Menu Structure
+
+The main display consists of a multi line menu system, most items are editable although are display only
+The main system configuration is through ther 'Routing Table' sub-menu where each output is assigned it data input source.
+the 400Hz PWM channels require additional configuration to select the type of output and channel used.
+
+
+ * Root menu,       Frequent use items
+ * EEPROM Data,     Non-volatile items, Settings load & save
+ * Routing Table,   Select inputs for ouput channel
+ * Snchro Config,   Select data conversion for 400Hz PWM output
+ * Synchro Channel, Select data channel for 400Hz PWM output
+
+Eleven sysnchro outputs are available, these output channels require additional configuration to select the output conversion and hardware. It is this channel information which is transfered across the I2C interface to the Pico PWM output board.
+
+Each 400Hz PWM output channel usually requires two outputs to drive synchros or resolvers. The Synchro config menu selects the type of output required, alternative output types are available for single channel output onto either of the channel pairs usually used. An additional kind of resolver output using I2C MDAC board instead of Pico PWM can also be selected. 
+
+The 400 Hz PWM channels are fed to audio amplifiers capable of driving synchros and resolvers or other similar devices. The ten Pico PWM outputs are connected to six stereo LM amplifier pairs. The six MAX532 outputs are connected to six mono TDA amplifiers. The amplifiers are main powered via suitable transformers.
+
+### 400Hz PWM Functions available
+
+|Function    |Hardware|Outputs|
+|------------|--------|-------|
+|Disabled    |None    |0      |
+|Synchro     |Pico    |0 to 5 |
+|Resolver    |Pico    |0 to 5 |
+|Sine_ChA    |Pico    |0 to 5 |
+|Sine_ChB    |Pico    |0 to 5 |
+|Reference   |Pico    |0 to 5 |
+|Resolver DAC|MDAC    |0 to 2 |
+
+
+#### Pico 400 Hz PWM outputs - 5 pairs available
+
+| | |
+|-|-|
+|0 ChA|GPIO0|
+|0 ChB|GPIO1|
+|1 ChA|GPIO2|
+|1 ChB|GPIO3|
+|2 ChA|GPIO4|
+|2 ChB|GPIO5|
+|3 ChA|GPIO6|
+|3 ChB|GPIO7|
+|4 ChA|GPIO8|
+|4 ChB|GPIO9|
+|5 ChA|unimplemented|
+|5 ChB|unimplemented|
+
+### Resolver DAC 400Hz outputs - 3 pairs available
+
+| | |
+|-|-|
+|0 ChA|MAX532-1a|
+|0 ChB|MAX532-1b|
+|1 ChA|MAX532-2a|
+|1 ChB|MAX532-2b|
+|2 ChA|MAX532-3a|
+|2 ChB|MAX532-3b|
+
+
 
 ## Input sources
 
@@ -287,6 +337,59 @@ Each channel is configured using one of 12 parameter sets, giving access to:
 |LED6         |               |
 |LED7         |               |
 |LED8         |               |
+
+
+## Confifuration example
+
+400 Hz synchro / resolver outputs have three confiruration settings each, Output channel number, output channel config, output channel device index.
+
+remaining outputs have only input configuration to set.
+
+
+### Routing table (400Hz PWM)
+
+|Channel No.|Routing Table|Synchro Config|Synchro Output|Notes|
+|-----------|-------------|--------------|--------------|-----|
+|PWM-0      |Map Fine     |MDAC Resolver |0             |Moving map|
+|PWM-1      |Map Medium   |MDAC Resolver |1             |Moving map|
+|PWM-2      |Map Coarse   |MDAC Resolver |2             |Moving map|
+|PWM-3      |Map Heading  |Resolver      |3             |Moving map|
+|PWM-4      |Map NtoS     |Resolver      |4             |Moving map|
+|PWM-5      |ADC Angle    |Synchro       |0             |General purpose|
+|PWM-6      |ADC Value 1  |Synchro       |1             |H6 Horizon from Gyro ADC|
+|PWM-7      |ADC Vakue 2  |Synchro       |2             |H6 Horizon from Gryo ADC|
+|PWM-8      |             |              |              ||
+|9-Arinc    |Encoder Pos  |Disabled      |n/a           ||
+|10-LED LHS |Map Heading  |Disabled      |n/a           ||
+|11-LED RHS |Map NtoS     |Disabled      |n/a           ||
+
+
+### Routing Table (remainder)
+
+|Output        |Input      |setting|Notes       |
+|--------------|-----------|-------|------------|
+|MapAbsoluteSet|MapPosition|Value  |Notes       |
+|DAC Galv1     |EEP Value5 |2048   |centre scale|
+|DAC Galv2     |EEP Value5 |2048   |centre scale|
+|DAC Galv3     |EEP Value5 |2048   |centre scale|
+|DAC Flag      |EEP Digit5 |TRUE   |Flag On|
+|DAC Relay     |EEP Value4 |4095   |Full power|
+|DAC Lamp      |EEP Value4 |4095   |Full power|
+|DAC Solenoid1 |EEP Value5 |2048   |half power|
+|DAC Solenoid2 |EEP Value5 |2048   |half power|
+|DAC Amp       |DIP SW1    |True   |On to enable amp|
+|DAC DC1       |DIP SW2    |True   |On to enable map|
+|DAC DC2       |DIP SW3    |True   |On to enable day|
+|DAC DC3       |Default    |       |Demo Bulb|
+|LED 1         |DIP SW1    |       |Lit when Amp enabled|
+|LED 2         |DIP SW2    |       |Lit when Map enabled|
+|LED 3         |DIP SW3    |       |Lit when Day enabled|
+|LED 4         |Default    |||
+|LED 5         |Default    |||
+|LED 6         |Default    |||
+|LED 7         |Default    |||
+|LED 8         |Default    |||
+
 
 ## Special functions
 

@@ -4116,8 +4116,8 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C16",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "deviceIO:",
-      "mcp23017:iox:32:35"
+      "mcp23017:iox:32:35",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
