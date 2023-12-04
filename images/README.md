@@ -50,6 +50,11 @@ HyperIMU_Flow.png
 </td>
 
 <td valign="bottom">
+<img src="./IMG_20230708_121225-COLLAGE_1024.jpg" width="200"><br>
+IMG_20230708_121225-COLLAGE_1024.jpg
+</td>
+
+<td valign="bottom">
 <img src="./IMG_20230801_204251.jpg" width="200"><br>
 IMG_20230801_204251.jpg
 </td>
@@ -59,13 +64,13 @@ IMG_20230801_204251.jpg
 IMG_20230802_115135.jpg
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./IMG_20230802_123456.jpg" width="200"><br>
 IMG_20230802_123456.jpg
 </td>
 
-</tr>
-<tr>
 <td valign="bottom">
 <img src="./IMG_20230807_195858.jpg" width="200"><br>
 IMG_20230807_195858.jpg
@@ -81,13 +86,13 @@ IMG_20231025_192352.jpg
 IMG_20231025_194250.jpg
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./IMU_Flow.png" width="200"><br>
 IMU_Flow.png
 </td>
 
-</tr>
-<tr>
 <td valign="bottom">
 <img src="./LM1875-Amp.jpg" width="200"><br>
 LM1875-Amp.jpg
@@ -103,13 +108,13 @@ LM1875-Schematic.png
 MAX532BipolarOperation.png
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./MAX532DaisyChain.png" width="200"><br>
 MAX532DaisyChain.png
 </td>
 
-</tr>
-<tr>
 <td valign="bottom">
 <img src="./MAX532ReferenceBuffer.jpg" width="200"><br>
 MAX532ReferenceBuffer.jpg
@@ -125,13 +130,13 @@ MQTT_NodeRed.png
 MX3aqjlUMAeUUY2H.png
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./OyH3q0k1a7W0Y7W8.png" width="200"><br>
 OyH3q0k1a7W0Y7W8.png
 </td>
 
-</tr>
-<tr>
 <td valign="bottom">
 <img src="./PCA9685-PWM-Power.jpg" width="200"><br>
 PCA9685-PWM-Power.jpg
@@ -147,13 +152,13 @@ PWM-Filter.jpg
 Pico-client-cpu.jpg
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./RMI.jpg" width="200"><br>
 RMI.jpg
 </td>
 
-</tr>
-<tr>
 <td valign="bottom">
 <img src="./TDA7294-Schematic.png" width="200"><br>
 TDA7294-Schematic.png
@@ -169,13 +174,13 @@ TcMenuExample.jpg
 WoVO8jZVJFkNUcRo.png
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./embedCONT.png" width="200"><br>
 embedCONT.png
 </td>
 
-</tr>
-<tr>
 <td valign="bottom">
 <img src="./menu0001.png" width="200"><br>
 menu0001.png
@@ -191,13 +196,13 @@ menu_IMU_Pitch.png
 menu_chan5.png
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./menu_chan8.png" width="200"><br>
 menu_chan8.png
 </td>
 
-</tr>
-<tr>
 <td valign="bottom">
 <img src="./tft_RoutingTable.png" width="200"><br>
 tft_RoutingTable.png
@@ -213,6 +218,8 @@ tft_SynchroChannel.png
 tft_screen_0.png
 </td>
 
+</tr>
+<tr>
 <td valign="bottom">
 <img src="./tft_screen_1.png" width="200"><br>
 tft_screen_1.png

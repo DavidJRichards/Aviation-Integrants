@@ -5,6 +5,8 @@ Modular microprocessor circuits for exercising aviation instruments
 
 [Control Menu](./software/readme.md)
 
+[MCP23017-Digital-I/O](./hardware/MCP23017-Digital-IO.md)
+
 [MAX532-MDAC](./hardware/MAX532-MDAC.md)
 
 [PCA9685-PWM-Power](./hardware/PCA9685-PWM-Power.md)
@@ -19,9 +21,9 @@ Modular microprocessor circuits for exercising aviation instruments
 
 [#1 Aviation Integrants Introduction](https://youtu.be/Xt561YlcXEw)
 
-[Aviation Integrants 400 Hz PWM](https://youtu.be/oUfFnTuM4sA)
+[#2 Aviation Integrants 400 Hz PWM](https://youtu.be/oUfFnTuM4sA)
 
-[Aviation Integrants flight demo](https://youtu.be/FEqSL34pKfE)
+[#3 Aviation Integrants flight demo](https://youtu.be/FEqSL34pKfE)
 
 ## [Photos](./images/README.md)
 

@@ -7,7 +7,8 @@
 #define USE_I2C_MASTER   // 
 #define USE_I2C_ADC      // ADS1115 ADC for Horizon Gyro
 #define USE_I2C_DAC      // PCA9685 PWM output (analogue/digital)
-#define USE_I2C_DIPSW_    // MCP23017
+#define USE_I2C_DIPSW_   // MCP23017 (now handled by TcMenu)
+#define USE_SPI_MDAC     // MAX5237 on SPI
 
 #include <Arduino.h>
 
@@ -105,6 +106,10 @@ float voltage_2_3;
   PCA9685 pwmController;
 #endif
 
+#ifdef USE_SPI_MDAC
+  #include "SPI_MDAC.h"
+#endif
+
 #define PIN_LED 4
 long target1_time = 0;    // event timer value
 
@@ -112,6 +117,7 @@ long target1_time = 0;    // event timer value
 #include "framework.h" // manages automatic connection / reconnection and runs setup() - put YOUR stuff in userSetup
 #include <ArduinoJson.h>
 StaticJsonDocument<500> doc;
+#define HYPERIMU_SENSOR "SensorAngles"
 const char *HyperIMUTopic =   "integrants/sub/HyperIMU";            // Topic to subscribe to
 const char *MovingMapTopic =  "integrants/sub/MovingMap";           // Topic to subscribe to
 const char *DigitalTopic =    "integrants/sub/DACdata";             // Topic to subscribe to
@@ -137,6 +143,7 @@ int fine_offset = DEFAULT_FINE_OFFSET;
 double absolute, ratio0, ratio1, ratio2;
 void abs2res(double);
 
+#ifndef USE_SPI_MDAC // following also defined in SPI_MDAC.h
 // single PWM channel config
 typedef struct {
   uint8_t       channel;        // 1
@@ -162,6 +169,7 @@ typedef struct  {
                         // 16
   byte padding[32];
 } t_I2cRxStruct;
+#endif
 
 // client I2C address
 const byte otherAddress = 0x30;
@@ -280,9 +288,9 @@ void onMqttMessage(const char* topic, const uint8_t* payload, size_t len,uint8_t
   }
   else if(0==strcmp(topic,HyperIMUTopic))
   {
-    compass=doc["orientation"][0].as<float>();
-    pitch  =doc["orientation"][1].as<float>();
-    roll   =doc["orientation"][2].as<float>();
+    compass=doc[HYPERIMU_SENSOR][0].as<float>();
+    pitch  =doc[HYPERIMU_SENSOR][1].as<float>();
+    roll   =doc[HYPERIMU_SENSOR][2].as<float>();
 
 #if 0
     Serial.printf("[%s] ",topic);
@@ -456,6 +464,12 @@ void userSetup() {
   Wire.begin(MCP_SDA,MCP_SCL);
   Wire.setClock(400000);
   setupMenu();
+  // boost gamma value, increases contrast in dark region.
+  gfx.writecommand(ILI9341_GAMMASET); //Gamma curve selected
+  gfx.writedata(2);
+  delay(120);
+  gfx.writecommand(ILI9341_GAMMASET); //Gamma curve selected
+  gfx.writedata(1);   
 
   Serial.begin(115200);
   while (!Serial && millis() < 5000);
@@ -530,6 +544,10 @@ void userSetup() {
 
 #endif
 
+#ifdef USE_SPI_MDAC
+   SPI_setup();
+#endif
+
   cb_ratio(0);
   cb_absolute(0);
   cb_phase(0);
@@ -578,15 +596,17 @@ void requestData() {
   }
 }
 
+#ifndef USE_SPI_MDAC // following also defined in SPI_MDAC.h
  enum menu_pwm_config {
   pwm_disable,
   pwm_synchro,
   pwm_resolver,
   pwm_sineCha,
-  pwm_sineChb
+  pwm_sineChb,
+  pwm_reference,
+  dac_resolver
  };
-
-
+#endif
 
  enum menu_destination {
   //0
@@ -745,12 +765,14 @@ float get_menuindex(int idx)
 #endif
 
       case MQTT_Value1:
-        value = doc["values"][0].as<int>();
+//        value = doc["values"][0].as<int>();
+        value = values[0];
         break;
 
       case MQTT_Value2:
-        value = doc["values"][1].as<int>();
-        break;
+//        value = doc["values"][1].as<int>();
+        value = values[1];
+       break;
 
       case MQTT_Value3:
         value = doc["values"][2].as<int>();
@@ -909,9 +931,14 @@ void loop() {
 
   taskManager.runLoop();
 
+
   if (target1_time < millis() ) 
   {
     target1_time += 500;
+
+#ifdef USE_SPI_MDAC
+    newDACdata = true;  // forces re-send SPI data if unchanged
+#endif
   
 // I2C send and receive to slave Pico2040 PWM generator  
     newTxData = true;
@@ -978,7 +1005,7 @@ void loop() {
     // 11 unused
     pwmController.setChannelPWM(12, get_menuindex(menuDACDC1.getCurrentValue() )>0?4095:0);
     pwmController.setChannelPWM(13, get_menuindex(menuDACDC2.getCurrentValue() )>0?4095:0);
-    pwmController.setChannelPWM(14, get_menuindex(menuDACDC3.getCurrentValue() )>0?4095:0);
+    pwmController.setChannelPWM(14, abs(get_menuindex(menuDACDC3.getCurrentValue() )* 1));              // spare channel
     pwmController.setChannelPWM(15, get_menuindex(menuDACAMP.getCurrentValue() )>0?4095:0);
 
 // LED output setting
@@ -1035,9 +1062,15 @@ void loop() {
   if(newTxData & ! i2cBusy)
   {
     update_pwm_angles();
+#ifdef USE_SPI_MDAC
+    SPI_process();
+#endif
     transmitData();
     requestData();
   }
+#ifdef USE_SPI_MDAC
+   SPI_write();
+#endif  
 
 }
 

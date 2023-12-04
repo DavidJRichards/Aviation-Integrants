@@ -1,0 +1,118 @@
+#include <Arduino.h>
+
+
+extern uint16_t* channels[3][2]; // three dual DAC chips
+extern byte spi_msg[9]; // three bytes per chip
+extern void SPI_setup(void);
+extern void SPI_write(void);
+extern void SPI_update(byte* pmsg, int index, uint16_t chan1, uint16_t chan2);
+extern bool newDACdata;
+extern float resolver_DAC_angles[3];
+
+void angle2res(int channel, byte config, float value=NAN, float bump=0);
+
+ enum menu_pwm_config {
+  pwm_disable,
+  pwm_synchro,
+  pwm_resolver,
+  pwm_sineCha,
+  pwm_sineChb,
+  pwm_reference,
+  dac_resolver
+ };
+
+
+
+typedef struct {
+  uint8_t       channel;
+  uint8_t       config;
+  uint16_t      amplitude;
+  float         value;
+} Channel_t;
+
+
+struct I2cRxStruct {
+  uint32_t config;          // 4
+  Channel_t channels[12];   // 12 * 8 = 96
+  uint16_t  phase_offset;   // 2
+  byte padding[30];         // 30
+                            //------
+                            // = 102+30
+};
+
+//I2cRxStruct rxData;
+
+
+void SPI_update(byte* pmsg, int index, uint16_t chan1, uint16_t chan2)
+{ 
+  index = index * 3;
+  pmsg[index+0] = (byte) (   chan2 >> 4);
+  pmsg[index+1] = (byte) ( ( chan2 << 4 ) | ( chan1 >> 8 ));
+  pmsg[index+2] = (byte) (   chan1 & 0xFF);
+}
+
+
+
+void angle2res(int channel, byte config, float value/*=NAN*/, float bump/*=0*/) {
+  float target;
+
+  switch(config){
+      
+    case dac_resolver:
+      // output to MDAC resolver 
+      if(channel<3)
+      {
+        if(value!=value)
+          value=resolver_DAC_angles[channel];
+        value = fmod(value + bump, 360);
+        if(value != resolver_DAC_angles[channel])
+        {
+          resolver_DAC_angles[channel] = value;
+          target = fmod(resolver_DAC_angles[channel], 360) * M_PI / 180.0;
+          *channels[channel][0] = 2048 + sin(target) * 2047.0;
+          *channels[channel][1] = 2048 + cos(target) * 2047.0;
+          SPI_update(spi_msg, channel, *channels[channel][0], *channels[channel][1] );
+          newDACdata = true;
+        }
+      }
+    break;
+  
+    default:
+    break;
+  }
+}
+
+void junk(void)
+{
+  int i;
+      for(i=0; i<12; i++)
+      {
+          angle2res(rxData.channels[i].channel, rxData.channels[i].config, rxData.channels[i].value);
+          //pwm_volts[i]=rxData.channels[i].amplitude;
+      }
+}
+
+void SPI_write(void) 
+{
+  SPI1.beginTransaction(setMAX532);
+  digitalWrite(slaveSelectPin, LOW);
+  SPI1.transfer(spi_msg, sizeof(spi_msg));
+  SPI1.endTransaction();
+  digitalWrite(slaveSelectPin, HIGH);
+}
+
+
+
+void SPI_process(void)
+{
+  if(newDACdata)
+  {
+    static bool led_blink=false;
+    led_blink = !led_blink;
+    digitalWrite(LED_BUILTIN, led_blink);
+    SPI_write();
+    newDACdata=false;
+  }
+}
+
+
