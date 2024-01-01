@@ -26,19 +26,13 @@
     },
     {
       "parentId": 0,
-      "type": "analogItem",
-      "defaultValue": "900",
+      "type": "actionMenu",
       "item": {
-        "maxValue": 3600,
-        "offset": 0,
-        "divisor": 10,
-        "unitName": "",
-        "step": 1,
-        "name": "Map_Heading",
-        "variableName": "MapHeading",
-        "id": 127,
-        "eepromAddress": 246,
-        "functionName": "cb_heading",
+        "name": "Eeprom Load",
+        "variableName": "EepromLoad",
+        "id": 29,
+        "eepromAddress": -1,
+        "functionName": "eeprom_load",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -47,19 +41,13 @@
     },
     {
       "parentId": 0,
-      "type": "analogItem",
-      "defaultValue": "900",
+      "type": "subMenu",
       "item": {
-        "maxValue": 1800,
-        "offset": -900,
-        "divisor": 10,
-        "unitName": "",
-        "step": 1,
-        "name": "Map_NtoS",
-        "variableName": "MapNtoS",
-        "id": 128,
-        "eepromAddress": 242,
-        "functionName": "cb_ntos",
+        "secured": false,
+        "name": "Moving Map",
+        "variableName": "MovingMap",
+        "id": 134,
+        "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -67,7 +55,7 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 134,
       "type": "analogItem",
       "defaultValue": "60",
       "item": {
@@ -88,7 +76,49 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 134,
+      "type": "analogItem",
+      "defaultValue": "900",
+      "item": {
+        "maxValue": 1800,
+        "offset": -900,
+        "divisor": 10,
+        "unitName": "",
+        "step": 1,
+        "name": "Map_NtoS",
+        "variableName": "MapNtoS",
+        "id": 128,
+        "eepromAddress": 242,
+        "functionName": "cb_ntos",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 134,
+      "type": "analogItem",
+      "defaultValue": "900",
+      "item": {
+        "maxValue": 3600,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "",
+        "step": 1,
+        "name": "Map_Heading",
+        "variableName": "MapHeading",
+        "id": 127,
+        "eepromAddress": 246,
+        "functionName": "cb_heading",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 134,
       "type": "largeNumItem",
       "defaultValue": "0",
       "item": {
@@ -107,23 +137,7 @@
       }
     },
     {
-      "parentId": 0,
-      "type": "floatItem",
-      "defaultValue": "0.0",
-      "item": {
-        "numDecimalPlaces": 1,
-        "name": "Map_Fine",
-        "variableName": "MapFine",
-        "id": 113,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": false,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 0,
+      "parentId": 134,
       "type": "analogItem",
       "defaultValue": "0",
       "item": {
@@ -144,14 +158,14 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 134,
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 1,
-        "name": "Map_Medium",
-        "variableName": "MapMedium",
-        "id": 114,
+        "name": "Map_Fine",
+        "variableName": "MapFine",
+        "id": 113,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -160,7 +174,7 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 134,
       "type": "analogItem",
       "defaultValue": "0",
       "item": {
@@ -181,14 +195,14 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 134,
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 1,
-        "name": "Map_Coarse",
-        "variableName": "MapCoarse",
-        "id": 115,
+        "name": "Map_Medium",
+        "variableName": "MapMedium",
+        "id": 114,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -197,7 +211,7 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 134,
       "type": "analogItem",
       "defaultValue": "0",
       "item": {
@@ -218,39 +232,23 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 134,
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 1,
-        "name": "Synchro_Angle",
-        "variableName": "SynchroAngle",
-        "id": 101,
+        "name": "Map_Coarse",
+        "variableName": "MapCoarse",
+        "id": 115,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true,
+        "visible": false,
         "staticDataInRAM": false
       }
     },
     {
-      "parentId": 0,
-      "type": "floatItem",
-      "defaultValue": "1028.0079",
-      "item": {
-        "numDecimalPlaces": 6,
-        "name": "Cal_Ratio2",
-        "variableName": "CalRatio2",
-        "id": 124,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 0,
+      "parentId": 134,
       "type": "largeNumItem",
       "defaultValue": "31.959840435",
       "item": {
@@ -269,7 +267,7 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 134,
       "type": "largeNumItem",
       "defaultValue": "32.165615772",
       "item": {
@@ -288,7 +286,7 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 134,
       "type": "analogItem",
       "defaultValue": "3200",
       "item": {
@@ -309,7 +307,7 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 134,
       "type": "analogItem",
       "defaultValue": "3200",
       "item": {
@@ -330,6 +328,22 @@
       }
     },
     {
+      "parentId": 134,
+      "type": "floatItem",
+      "defaultValue": "1028.0079",
+      "item": {
+        "numDecimalPlaces": 6,
+        "name": "Cal_Ratio2",
+        "variableName": "CalRatio2",
+        "id": 124,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
       "parentId": 0,
       "type": "subMenu",
       "item": {
@@ -338,36 +352,6 @@
         "variableName": "EEPROMData",
         "id": 4,
         "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 4,
-      "type": "actionMenu",
-      "item": {
-        "name": "Eeprom Save",
-        "variableName": "EepromSave",
-        "id": 28,
-        "eepromAddress": -1,
-        "functionName": "eeprom_save",
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 4,
-      "type": "actionMenu",
-      "item": {
-        "name": "Eeprom Load",
-        "variableName": "EepromLoad",
-        "id": 29,
-        "eepromAddress": -1,
-        "functionName": "eeprom_load",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -648,6 +632,103 @@
         "variableName": "EEPAngle5",
         "id": 39,
         "eepromAddress": 66,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "analogItem",
+      "defaultValue": "130",
+      "item": {
+        "maxValue": 160,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "Vrms",
+        "step": 1,
+        "name": "Synchro_Amplitude",
+        "variableName": "SynchroAmplitude",
+        "id": 63,
+        "eepromAddress": 92,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "analogItem",
+      "defaultValue": "110",
+      "item": {
+        "maxValue": 160,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "Vrms",
+        "step": 1,
+        "name": "Reference_Amplitude",
+        "variableName": "ReferenceAmplitude",
+        "id": 117,
+        "eepromAddress": 196,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "analogItem",
+      "defaultValue": "802",
+      "item": {
+        "maxValue": 2000,
+        "offset": 0,
+        "divisor": 100,
+        "unitName": "",
+        "step": 1,
+        "name": "RmsNominal",
+        "variableName": "RmsNominal",
+        "id": 120,
+        "eepromAddress": 232,
+        "functionName": "cb_voltage",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "analogItem",
+      "defaultValue": "6",
+      "item": {
+        "maxValue": 255,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "",
+        "step": 1,
+        "name": "PhaseOffset",
+        "variableName": "PhaseOffset",
+        "id": 125,
+        "eepromAddress": 244,
+        "functionName": "cb_phase",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "actionMenu",
+      "item": {
+        "name": "Eeprom Save",
+        "variableName": "EepromSave",
+        "id": 28,
+        "eepromAddress": -1,
+        "functionName": "eeprom_save",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -3575,69 +3656,13 @@
     },
     {
       "parentId": 0,
-      "type": "analogItem",
-      "defaultValue": "130",
-      "item": {
-        "maxValue": 160,
-        "offset": 0,
-        "divisor": 10,
-        "unitName": "Vrms",
-        "step": 1,
-        "name": "Synchro_Amplitude",
-        "variableName": "SynchroAmplitude",
-        "id": 63,
-        "eepromAddress": 92,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "analogItem",
-      "defaultValue": "110",
-      "item": {
-        "maxValue": 160,
-        "offset": 0,
-        "divisor": 10,
-        "unitName": "Vrms",
-        "step": 1,
-        "name": "Reference_Amplitude",
-        "variableName": "ReferenceAmplitude",
-        "id": 117,
-        "eepromAddress": 196,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 0,
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 1,
-        "name": "FREQ_Gen",
-        "variableName": "FREQGen",
-        "id": 48,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "floatItem",
-      "defaultValue": "0.0",
-      "item": {
-        "numDecimalPlaces": 1,
-        "name": "FREQ_Syn",
-        "variableName": "FREQSyn",
-        "id": 49,
+        "name": "Synchro_Angle",
+        "variableName": "SynchroAngle",
+        "id": 101,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -3871,19 +3896,14 @@
     },
     {
       "parentId": 0,
-      "type": "analogItem",
-      "defaultValue": "802",
+      "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
-        "maxValue": 2000,
-        "offset": 0,
-        "divisor": 100,
-        "unitName": "",
-        "step": 1,
-        "name": "RmsNominal",
-        "variableName": "RmsNominal",
-        "id": 120,
-        "eepromAddress": 232,
-        "functionName": "cb_voltage",
+        "numDecimalPlaces": 1,
+        "name": "FREQ_Syn",
+        "variableName": "FREQSyn",
+        "id": 49,
+        "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -3892,19 +3912,14 @@
     },
     {
       "parentId": 0,
-      "type": "analogItem",
-      "defaultValue": "6",
+      "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
-        "maxValue": 255,
-        "offset": 0,
-        "divisor": 1,
-        "unitName": "",
-        "step": 1,
-        "name": "PhaseOffset",
-        "variableName": "PhaseOffset",
-        "id": 125,
-        "eepromAddress": 244,
-        "functionName": "cb_phase",
+        "numDecimalPlaces": 1,
+        "name": "FREQ_Gen",
+        "variableName": "FREQGen",
+        "id": 48,
+        "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -4116,8 +4131,8 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C16",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "mcp23017:iox:32:35",
-      "deviceIO:"
+      "deviceIO:",
+      "mcp23017:iox:32:35"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

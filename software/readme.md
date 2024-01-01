@@ -246,61 +246,81 @@ The 400 Hz PWM channels are fed to audio amplifiers capable of driving synchros 
 
 ## Input sources
 
-|Source |                    |
-|-------|--------------------|
-|Default|                    |
-|ENCODER_Pos|                |
-|FERQ_Gen|Internal frequency |
-|FREQ_Syn|External frequency |
-|ADC_Value1|Horizon Pitch    |
-|ADC_Value2|Horizon Roll     |
-|IMU_Pitch|HyperIMU          |
-|IMU_Roll|HyperIMU           |
-|IMU_Heading|HyperIMU        |
-|ADC_Angle  |Synchro receiver|
-|DIP_SW1||
-|DIP_SW2||
-|DIP_SW3||
-|DIP_SW4||
-|DIP_SW5||
-|DIP_SW6||
-|DIP_SW7||
-|DIP_SW8||
-|MQTT_Value1|0 to 4096       |
-|MQTT_Value2|                |
-|MQTT_Value3|                |
-|MQTT_Value4|                |
-|MQTT_Value5|                |
-|MQTT_Digit1|0 to 1          |
-|MQTT_Digit2|                |
-|MQTT_Digit3|                |
-|MQTT_Digit4|                |
-|MQTT_Digit5|                |
-|MQTT_Digit6|                |
-|MQTT_Digit7|                |
-|MQTT_Digit8|                |
-|EEP_Digit1|0 to 1 (0)       |
-|EEP_Digit2|                 |
-|EEP_Digit3|                 |
-|EEP_Digit4|                 |
-|EEP_Digit5|                 |
-|EEP_Value1|0 to 4096 (2048) |
-|EEP_Value2|                 |
-|EEP_Value3|                 |
-|EEP_Value4|                 |
-|EEP_Value5|                 |
-|EEP_Angle1|-180 to 180 (0)  |
-|EEP_Angle2|                 |
-|EEP_Angle3|                 |
-|EEP_Angle4|                 |
-|EEP_Angle5|                 |
-|MAP Absolute|value input         |
-|MAP Fine    |Calculated from abs.|
-|MAP Medium  |Calculated from abs.|
-|MAP Coarse  |Calculated from abs.|
+* Access float get_menuindex(int idx)
+* uses menuXXX.getCurrentValue() for menu items
+* or doc["XXX"][N].as<TYPE>(); for MQTT JSON value
+
+|Index|Source |                    |Access|
+|-----|-------|--------------------|-|
+|0|Default|                    |
+|1|ENCODER_Pos|                |encoder_pos=menuEncoder.getCurrentValue()-2048;|
+|2|FERQ_Gen|Internal frequency |value = rxData.gen_frequency;
+|3|FREQ_Syn|External frequency |value = rxData.syn_frequency;
+|4|ADC_Value1|Horizon Pitch    |
+|5|ADC_Value2|Horizon Roll     |
+|6|IMU_Pitch|HyperIMU          |
+|7|IMU_Roll|HyperIMU           |
+|8|IMU_Heading|HyperIMU        |
+|9|ADC_Angle  |Synchro receiver|
+|10|DIP_SW1|                   |
+|11|DIP_SW2|                   |
+|12|DIP_SW3|                   |
+|13|DIP_SW4|                   |
+|14|DIP_SW5|                   |
+|15|DIP_SW6|                   |
+|16|DIP_SW7|                   |
+|17|DIP_SW8|                   |
+|18|MQTT_Value1|0 to 4096       |
+|19|MQTT_Value2|                |
+|20|MQTT_Value3|                |
+|21|MQTT_Value4|                |
+|22|MQTT_Value5|                |
+|23|MQTT_Digit1|0 to 1          |
+|24|MQTT_Digit2|                |
+|25|MQTT_Digit3|                |
+|26|MQTT_Digit4|                |
+|27|MQTT_Digit5|                |
+|28|MQTT_Digit6|                |
+|29|MQTT_Digit7|                |
+|30|MQTT_Digit8|                |
+|31|EEP_Digit1|0 to 1 (0)       |
+|32|EEP_Digit2|                 |
+|33|EEP_Digit3|                 |
+|34|EEP_Digit4|                 |
+|35|EEP_Digit5|                 |
+|36|EEP_Value1|0 to 4096 (2048) |
+|37|EEP_Value2|                 |
+|38|EEP_Value3|                 |
+|39|EEP_Value4|                 |
+|40|EEP_Value5|                 |
+|41|EEP_Angle1|-180 to 180 (0)  |
+|42|EEP_Angle2|                 |
+|43|EEP_Angle3|                 |
+|44|EEP_Angle4|                 |
+|45|EEP_Angle5|                 |
+|46|MAP Absolute|value input         |
+|47|MAP Fine    |Calculated from abs.|
+|48|MAP Medium  |Calculated from abs.|
+|49|MAP Coarse  |Calculated from abs.|
+|50|MAP Position|                    |
+|51|MAP Heading |                    |
+|52|MAP NtoS    |                    |
 
  
 ## Output sinks
+
+todo: create general purpose write data function
+
+// to remote synchros
+ * pwm type config |    txData.channels[0].config = menuPWMConfigCH0.getCurrentValue();
+ * pwm channel channel | txData.channels[0].channel = menuPWMChannelCH0.getCurrentValue();
+ * pwm voltage config | txData.channels[0].amplitude =menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
+
+// to local hardware
+todo create readonly menu items for these
+ * adc output setting | pwmController.setChannelPWM( 1, get_menuindex(menuDACGalv1.getCurrentValue() )); 
+ * LED output setting | mcp23017.digitalWriteS(led1, get_menuindex(menuLED1.getCurrentValue() ));
+
 
 |Sink         |               |
 |-------------|---------------|

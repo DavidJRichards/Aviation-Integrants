@@ -45,3 +45,8 @@
 # backups
 *.*~
 
+software/backup
+software/CYD_Multi
+software/IntegrantsMaster/data
+software/IntegrantsMaster/data-old
+

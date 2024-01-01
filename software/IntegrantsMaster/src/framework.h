@@ -37,9 +37,9 @@ void connectToMqtt() {
 }
 void connectToWifi() {
   if(!WiFi.isConnected()){
-    Serial.printf("Connecting to Wi-Fi... SSID=%s\n",WIFI_SSID);
+    Serial.printf("Connecting to Wi-Fi... SSID=%s\n\r",WIFI_SSID);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  } else Serial.printf("Already connected\n");
+  } else Serial.printf("Already connected\n\r");
 }
 
 #ifdef ARDUINO_ARCH_ESP32
@@ -77,7 +77,7 @@ void onMqttError(uint8_t e,uint32_t info){
   switch(e){
     case TCP_DISCONNECTED:
         // usually because your structure is wrong and you called a function before onMqttConnect
-        Serial.printf("ERROR: NOT CONNECTED info=%d\n",info);
+        Serial.printf("ERROR: NOT CONNECTED info=%d\n\r",info);
         break;
     case MQTT_SERVER_UNAVAILABLE:
         // server has gone away - network problem? server crash?
@@ -138,14 +138,14 @@ void onWifiDisconnect(const WiFiEventStationModeDisconnected& event) {
 
 extern void onMqttDisconnect(int8_t reason);
 void onMqttDisconnect(int8_t reason) {
-  Serial.printf("Disconnected from MQTT reason=%d\n",reason);
+  Serial.printf("Disconnected from MQTT reason=%d\n\r",reason);
   mqttReconnectTimer.once(RECONNECT_DELAY_M, connectToMqtt);
 }
 
 void setup() {
   Serial.begin(115200);
   delay(250); //why???
-  Serial.printf("%s Starting heap=%u\n",LIBRARY,ESP.getFreeHeap());
+  Serial.printf("%s Starting heap=%u\n\r",LIBRARY,ESP.getFreeHeap());
   
 #ifdef ARDUINO_ARCH_ESP32
   WiFi.onEvent(WiFiEvent);

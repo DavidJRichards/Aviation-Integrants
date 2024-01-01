@@ -86,7 +86,7 @@ void SPI_write(void)
 {
   SPI1.beginTransaction(setMAX532);
   digitalWrite(slaveSelectPin, LOW);
-  SPI1.transfer(spi_msg, sizeof(spi_msg));
+  SPI1.transfer(spi_msg, NULL, sizeof(spi_msg));
   SPI1.endTransaction();
   digitalWrite(slaveSelectPin, HIGH);
 }

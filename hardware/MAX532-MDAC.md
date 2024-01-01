@@ -8,11 +8,17 @@ The new circuits need +- 12 volts, this is provided by an inverter board powered
 
 [MAX532 pdf](../documents/MAX532.pdf)
 
+##Schematics
+
+[circuit.net schematic](https://crcit.net/c/46ec9b44c03c4374af5fbf4117a229d3)
+
 ![MAX532 Bipolar Operation](../images/MAX532BipolarOperation.png)
 
 ![MAX532 Reference Buffer](../images/MAX532ReferenceBuffer.jpg)
 
 ![MAX532 Daisy Chain](../images/MAX532DaisyChain.png)
+
+![Board schematic](../images/MAX532-MDAC-board.png)
 
 Here is a picture of the prototype MDAC board, it uses the bipolar configuration with an op-amp to shift the output into zero centred range as per the data sheet. The reference is buffered by another op-amp from one side of the same pair of signals feeding the MM display unit. Apart from the amplifier and output isolation capacitor everything is DC coupled.
 

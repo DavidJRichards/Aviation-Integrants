@@ -7,8 +7,9 @@
 #define USE_I2C_MASTER   // 
 #define USE_I2C_ADC      // ADS1115 ADC for Horizon Gyro
 #define USE_I2C_DAC      // PCA9685 PWM output (analogue/digital)
-#define USE_I2C_DIPSW_   // MCP23017 (now handled by TcMenu)
+#define USE_I2C_DIPSW_   // MCP23017 (now handled by TcMenu IO Abstraction)
 #define USE_SPI_MDAC     // MAX5237 on SPI
+#define USE_FORTH
 
 #include <Arduino.h>
 
@@ -68,7 +69,7 @@ MCP23017IoAbstraction mcp23017(0x20, ACTIVE_LOW_OPEN,  attachedInterruptPin, IO_
 extern bool screenServer(String filename);
 
 #ifdef USE_I2C_DIPSW
-#include <MCP23017.h>
+?#include <MCP23017.h>
 #define MCP_ADDRESS 0x20 // (A2/A1/A0 = LOW)
 
 #define RESET_PIN 99 
@@ -88,7 +89,7 @@ int pub_bits, sub_bits, bits;
 
 int encoder_pos;
 
-#define I2C_ADDRESS 0x48
+#define I2C_ADDRESS 0x48      // 
 #define GYRO_POT_FACTOR 56.0  // reading is degrees
 #define GYRO_POT_FACTOR_PITCH GYRO_POT_FACTOR
 #define GYRO_POT_FACTOR_ROLL GYRO_POT_FACTOR
@@ -126,6 +127,7 @@ const char *LEDdataTopic =    "integrants/sub/LEDdata";             // Topic to 
 const char *StatusTopic =     "integrants/pub/status";              // Topic to subscribe to
 float pitch, roll, compass;
 int values[16];
+float fvalues[16];
 bool led_blink_green = false;
 bool led_blink_blue = false;
 
@@ -133,6 +135,10 @@ bool led_blink_blue = false;
 #define DEFAULT_COARSE_OFFSET 0
 #define DEFAULT_MEDIUM_OFFSET 0
 #define DEFAULT_FINE_OFFSET 0
+
+
+extern void setup_forth(void);
+extern void loop_forth(void);
 
 void mqtt_publish(void);
 
@@ -342,29 +348,41 @@ void onMqttMessage(const char* topic, const uint8_t* payload, size_t len,uint8_t
     values[9]=doc["values"][9].as<int>();
     values[10]=doc["values"][10].as<int>();
 
+    fvalues[0]=doc["values"][0].as<float>();
+    fvalues[1]=doc["values"][1].as<float>();
+    fvalues[2]=doc["values"][2].as<float>();
+    fvalues[3]=doc["values"][3].as<float>();
+    fvalues[4]=doc["values"][4].as<float>();
+    fvalues[5]=doc["values"][5].as<float>();
+    fvalues[6]=doc["values"][6].as<float>();
+    fvalues[7]=doc["values"][7].as<float>();
+    fvalues[8]=doc["values"][8].as<float>();
+    fvalues[9]=doc["values"][9].as<float>();
+    fvalues[10]=doc["values"][10].as<float>();
+
     Serial.printf("[%s] ",topic);
-    Serial.print(F("\nValues:"));
-    Serial.print(values[0]);
+    Serial.print(F("\nfValues:"));
+    Serial.print(fvalues[0]);
     Serial.print(", ");
-    Serial.print(values[1]);
+    Serial.print(fvalues[1]);
     Serial.print(", ");
-    Serial.print(values[2]);
+    Serial.print(fvalues[2]);
     Serial.print(", ");
-    Serial.print(values[3]);
+    Serial.print(fvalues[3]);
     Serial.print(", ");
-    Serial.print(values[4]);
+    Serial.print(fvalues[4]);
     Serial.print(", ");
-    Serial.print(values[5]);
+    Serial.print(fvalues[5]);
     Serial.print(", ");
-    Serial.print(values[6]);
+    Serial.print(fvalues[6]);
     Serial.print(", ");
-    Serial.print(values[7]);
+    Serial.print(fvalues[7]);
     Serial.print(", ");
-    Serial.print(values[8]);
+    Serial.print(fvalues[8]);
     Serial.print(", ");
-    Serial.print(values[9]);
+    Serial.print(fvalues[9]);
     Serial.print(", ");
-    Serial.print(values[10]);
+    Serial.print(fvalues[10]);
     Serial.println();
 
   }
@@ -510,7 +528,7 @@ void userSetup() {
   pwmController.setChannelPWM(12, 0);   // Set PWM to full on  (28 volt hi side driver to DC1)
   pwmController.setChannelPWM(13, 0);   // Set PWM to full on  (28 volt hi side driver to DC2)
   pwmController.setChannelPWM(14, 0);   // Set PWM to full on  (28 volt hi side driver to DC3)
-  pwmController.setChannelPWM(15, 0   );   // Set PWM to off      (28 volt hi side driver to Amp Mains relay)
+  pwmController.setChannelPWM(15, 0);   // Set PWM to off      (28 volt hi side driver to Amp Mains relay)
 // ch15  
 #endif
 
@@ -552,6 +570,9 @@ void userSetup() {
   cb_absolute(0);
   cb_phase(0);
 
+#ifdef USE_FORTH
+  setup_forth();
+#endif
 }
 
 //=============================================================================
@@ -993,13 +1014,17 @@ void loop() {
     txData.channels[11].amplitude=menuRmsNominal.getCurrentValue() * 100.0 / menuSynchroAmplitude.getCurrentValue();
 
 // adc output setting
+#ifdef USE_I2C_DAC
     pwmController.setChannelPWM( 1, get_menuindex(menuDACGalv1.getCurrentValue() )); // galv
     pwmController.setChannelPWM( 2, get_menuindex(menuDACGalv2.getCurrentValue() ));
     pwmController.setChannelPWM( 3, get_menuindex(menuDACGalv3.getCurrentValue() ));
+    // 4 unused
     pwmController.setChannelPWM( 5, get_menuindex(menuDACFlag1.getCurrentValue() )>0?4095:0);  // flag
     pwmController.setChannelPWM( 6, get_menuindex(menuDACFlag2.getCurrentValue() )>0?4095:0);
+
     pwmController.setChannelPWM( 7, get_menuindex(menuDACRelay.getCurrentValue() ));
     pwmController.setChannelPWM( 8, get_menuindex(menuDACLamp.getCurrentValue() ));
+
     pwmController.setChannelPWM( 9, get_menuindex(menuDACSolenoid1.getCurrentValue() )>0?4095:0); // solenoid
     pwmController.setChannelPWM(10, get_menuindex(menuDACSolenoid2.getCurrentValue() )>0?4095:0);
     // 11 unused
@@ -1007,6 +1032,7 @@ void loop() {
     pwmController.setChannelPWM(13, get_menuindex(menuDACDC2.getCurrentValue() )>0?4095:0);
     pwmController.setChannelPWM(14, abs(get_menuindex(menuDACDC3.getCurrentValue() )* 1));              // spare channel
     pwmController.setChannelPWM(15, get_menuindex(menuDACAMP.getCurrentValue() )>0?4095:0);
+#endif
 
 // LED output setting
     mcp23017.digitalWriteS(led1, get_menuindex(menuLED1.getCurrentValue() ));
@@ -1035,12 +1061,14 @@ void loop() {
 // set menu display of read synchro angle
     menuSynchroAngle.setFloatValue(rxData.adc_angle);
 
+#ifdef USE_I2C_ADC
 // set menu display of Horizon gyro ADC values    
     voltage_0_1=readChannel(ADS1115_COMP_0_1)*GYRO_POT_FACTOR_PITCH;
     menuADC1Voltage.setFloatValue(voltage_0_1);
 
     voltage_2_3=readChannel(ADS1115_COMP_2_3)*GYRO_POT_FACTOR_ROLL;
     menuADC2Voltage.setFloatValue(voltage_2_3);
+#endif
 
 // display of PWM angles values sent to I2C client
     menuPWM0.setFloatValue( txData.channels[0].value);
@@ -1072,6 +1100,9 @@ void loop() {
    SPI_write();
 #endif  
 
+#ifdef USE_FORTH
+  loop_forth();
+#endif
 }
 
 //=============================================================================

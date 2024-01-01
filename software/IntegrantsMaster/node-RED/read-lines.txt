@@ -1,0 +1,184 @@
+[
+    {
+        "id": "9a53bb39f51341d0",
+        "type": "tab",
+        "label": "Flow 4",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "5ee6f8a9e0442251",
+        "type": "function",
+        "z": "9a53bb39f51341d0",
+        "name": "Readlines",
+        "func": "let Lines =context.get(\"Lines\");\nlet lineNumber = context.get(\"lineNumber\");\nlet line;\nif (typeof lineNumber==\"undefined\")\n     lineNumber = 1;\n\nif (msg.topic==\"next\")\n{\n    line = Lines.next();\n\n}\nif (msg.topic == \"reset\")\n{\n    lineNumber=1;\n    Lines.reset();\n    Lines = new Readlines('data/test/demo-data.txt');\n    context.set(\"Lines\", Lines);\n    context.set(\"lineNumber\", 1);\n    line = Lines.next()\n}   \n\nnode.log(`Line ${lineNumber} has: ${line.toString('ascii')}`);\nlineNumber++;\ncontext.set(\"lineNumber\",lineNumber);\nmsg.payload = JSON.parse(line.toString('ascii'));\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\nvar Lines = new Readlines('data/test/demo-data.txt');\ncontext.set(\"Lines\",Lines);\ncontext.set(\"lineNumber\",1);",
+        "finalize": "// Code added here will be run when the\n// node is being stopped or re-deployed.\nlet Lines = context.get(\"Lines\");\nLines.close();",
+        "libs": [
+            {
+                "var": "Readlines",
+                "module": "n-readlines"
+            }
+        ],
+        "x": 400,
+        "y": 180,
+        "wires": [
+            [
+                "e38a308c8e537ea2"
+            ]
+        ]
+    },
+    {
+        "id": "745426bd47ad34c6",
+        "type": "inject",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "next",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 140,
+        "wires": [
+            [
+                "5ee6f8a9e0442251"
+            ]
+        ]
+    },
+    {
+        "id": "70194065f77b668a",
+        "type": "inject",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "reset",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 280,
+        "wires": [
+            [
+                "5ee6f8a9e0442251"
+            ]
+        ]
+    },
+    {
+        "id": "e38a308c8e537ea2",
+        "type": "debug",
+        "z": "9a53bb39f51341d0",
+        "name": "debug 69",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "49de37d47ede64b7",
+        "type": "inject",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 420,
+        "wires": [
+            [
+                "114de460fd58b757"
+            ]
+        ]
+    },
+    {
+        "id": "114de460fd58b757",
+        "type": "file in",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "filename": "data/test/demo-data.txt",
+        "filenameType": "str",
+        "format": "lines",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": true,
+        "x": 300,
+        "y": 400,
+        "wires": [
+            [
+                "41c635ed75a3291d"
+            ]
+        ]
+    },
+    {
+        "id": "41c635ed75a3291d",
+        "type": "json",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 510,
+        "y": 400,
+        "wires": [
+            [
+                "e38a308c8e537ea2"
+            ]
+        ]
+    },
+    {
+        "id": "b7c4f4ea044a53ed",
+        "type": "comment",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "info": "https://geshan.com.np/blog/2021/10/nodejs-read-file-line-by-line/",
+        "x": 400,
+        "y": 300,
+        "wires": []
+    }
+]

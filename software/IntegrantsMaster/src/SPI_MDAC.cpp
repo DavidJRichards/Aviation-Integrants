@@ -44,16 +44,11 @@ void SPI_write(void)
   {
     static bool led_blink=false;
     int i,channel,index;
-    byte spi_msg_copy[BYTES_MDAC_SPI_BUFFER];
-    for(i=0;i<BYTES_MDAC_SPI_BUFFER;i++)
-    { // sent data gets overwritten by received data
-      spi_msg_copy[i]=spi_msg[i];
-    } // copy needed if data gets re-sent
     led_blink = !led_blink;
-    digitalWrite(LED_BUILTIN, led_blink);
+    //digitalWrite(LED_BUILTIN, led_blink);
     mySpi.beginTransaction(setMAX532);
     digitalWrite(slaveSelectPin, LOW);
-    mySpi.transfer(spi_msg_copy, sizeof(spi_msg));
+    mySpi.transferBytes(spi_msg, NULL, sizeof(spi_msg));
     mySpi.endTransaction();
     digitalWrite(slaveSelectPin, HIGH);
     newDACdata=false;
