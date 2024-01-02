@@ -1,0 +1,657 @@
+[
+    {
+        "id": "9b49daa1.9f5a9",
+        "type": "function",
+        "z": "9a53bb39f51341d0",
+        "name": "Store Data",
+        "func": "var local=flow.get('local') || {};\nvar topic=msg.topic;\nvar payload=msg.payload;\nvar last_payload=\"\";\nvar msg2={};\nvar by_topic=local.by_topic || false; // log by topic\nvar all_data=local.all_data || true; // log all data or only changed data\nvar store_time=local[\"store_time\"] ||false;\nvar store_topic=local[\"store_topic\"] ||false;\nvar start_logger=local[\"start_logger\"] || false;\nvar ignore_switches=local['ignore-switches'] || false;\nvar max_size =5000000; //maximum log file size\n\n//node.log(\" topic =\"+topic +\"message \"+msg.payload);\n//node.log(\" store topic =\"+ store_topic +start_logger);\n//\nfunction get_filename(topic,payload)\n{\n\n if (!(topic in local))\n\tlocal[topic]={}; //create\n\nvar filename=local[topic][\"cf_name\"] || \"log000.txt\";\n\n//node.log(filename);\nvar cf_counter=local[topic].cf_counter || 0;\nvar cf_size=local[topic].cf_size || 0;\n//node.log(\"file size=\"+cf_size +\" counter  \"+cf_counter);\ncf_size = cf_size +payload.length;\n\nif (cf_size>max_size)\n{\n//node.log(\"size limit reached\")\ncf_counter+=1\nvar count=cf_counter.toString();\nif (count.length==1)\ncount=\"00\"+count;\nif (count.length==2)\ncount=\"0\"+count;\n//\nfilename=\"log\"+count+\".txt\";\ncf_size=0;\n}\n//node.log(\"file size=\"+cf_size +\" counter  \"+cf_counter);\n//\nlocal[topic][\"cf_name\"]=filename;\nlocal[topic][\"cf_counter\"]= cf_counter;\nlocal[topic][\"cf_size\"]= cf_size;\nflow.set(\"local\",local);\nmsg2.payload=cf_counter;\n\n//\nreturn filename;\n\n\n}\nfunction message_changed(payload,topic)\n{\n  \tif (!local.all_data) //not logging all data\n\t {  \n\t\tif (!(local[topic]===undefined)) //test exists\n\t\t{\n\t\n\t\tlast_payload=local[topic][\"last_payload\"];\n\n\t\t//node.log(\"last payload \"+ last_payload);\n\t\t//node.log(\"This payload \"+ payload);\n\t\t}\n\t\telse\n\t\t\t\tlocal[\"topic\"]={}; //initialise\n\n\t\t//\n\t\tif (payload===last_payload)\n\t\t{\n\t\t//node.log(\"same data \"+topic +\"not logging\");\n\t\treturn false;\n\t\t}\n\t}  \n\treturn true;\n}\n\n//node.log(\"start_logger is \"+start_logger);\n\n\nif (start_logger)\n{\n//node.log(\"logging all data \"+local.all_data+ \"by topic\"+local.by_topic);\n\n//\n    var d = new Date();\n    var t = d.getTime();\n    try {\n    new_payload=JSON.parse(payload); //convert to javascript\n    //node.log(\"data is already Json\");\n    payload=new_payload;\n    }\n    catch (e){\n    \t//node.log(\"data is not Json\");\n    }\n    \n    if (store_time && store_topic)\t\n    \tpayload={\"time\":t,\"payload\":payload,\"topic\":topic};\n    if (store_time && !store_topic)\n    \tpayload={\"time\":t,\"payload\":payload};\n    if (!store_time && store_topic)\n    \tpayload={\"payload\":payload,\"topic\":topic};\n    if (!store_time && !store_topic)\n    \tpayload={\"payload\":payload};\t\n    payload=JSON.stringify(payload);\n    //node.log(\"payload is \",payload);\n    if (local.by_topic==true)\n        topic=msg.topic;\n    else\n        topic=\"default\";\n    \n    var filename=get_filename(topic,payload);\n    l=topic.length;\n    if (topic[l-1] !=\"/\")\n        msg.filename = \"/home/david/Integrants/\"+ topic +\"/\"+filename;\n    else\n        msg.filename = \"/home/david/Integrants/\"+ topic +filename;\n    //node.log(\"filename= \"+msg.filename);\n    msg.payload=payload;\n    if(message_changed(payload,topic))\n    {\n        local[topic][\"last_payload\"]=payload;\n        flow.set('local',local);\n        return msg;\n    }\n    else\n      return null;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 160,
+        "wires": [
+            [
+                "3b03cc9c.f6563c",
+                "6706c6f9.fdcd58"
+            ]
+        ]
+    },
+    {
+        "id": "dc010139.a13ea",
+        "type": "mqtt in",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "topic": "integrants/sub/#",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "8d987c68b143b2a4",
+        "nl": false,
+        "rap": false,
+        "x": 140,
+        "y": 160,
+        "wires": [
+            [
+                "9b49daa1.9f5a9",
+                "df031aa.192a1e8"
+            ]
+        ]
+    },
+    {
+        "id": "3b03cc9c.f6563c",
+        "type": "file",
+        "z": "9a53bb39f51341d0",
+        "name": "log sensor data",
+        "filename": "",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "x": 1060,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bf38020c.9d21a",
+        "type": "ui_switch",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "label": "All Data",
+        "tooltip": "",
+        "group": "8130ac76.081eb8",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "ALL-DATA",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": true,
+        "className": "",
+        "x": 600,
+        "y": 560,
+        "wires": [
+            [
+                "472fac13.c5fdf4"
+            ]
+        ]
+    },
+    {
+        "id": "81ef6686.e3d91",
+        "type": "ui_switch",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "label": "Log By Topic",
+        "tooltip": "",
+        "group": "8130ac76.081eb8",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "BY-TOPIC",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": true,
+        "className": "",
+        "x": 610,
+        "y": 420,
+        "wires": [
+            [
+                "472fac13.c5fdf4"
+            ]
+        ]
+    },
+    {
+        "id": "c91ec1e4.d4872",
+        "type": "ui_switch",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "label": "Start Logging",
+        "tooltip": "",
+        "group": "8130ac76.081eb8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "START",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": true,
+        "className": "",
+        "x": 610,
+        "y": 360,
+        "wires": [
+            [
+                "472fac13.c5fdf4"
+            ]
+        ]
+    },
+    {
+        "id": "2d665a71.bb4c36",
+        "type": "inject",
+        "z": "9a53bb39f51341d0",
+        "name": "Set Initial switch states",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "init",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 180,
+        "y": 460,
+        "wires": [
+            [
+                "9c961d31.c2abc"
+            ]
+        ]
+    },
+    {
+        "id": "8782b6a7.1a55c8",
+        "type": "ui_text",
+        "z": "9a53bb39f51341d0",
+        "group": "7efb4fcd.d113d8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Stop/Start",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1060,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "43ef5b8a.490874",
+        "type": "ui_switch",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "label": "Store Date-Time",
+        "tooltip": "",
+        "group": "8130ac76.081eb8",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "STORE-TIME",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": true,
+        "className": "",
+        "x": 620,
+        "y": 500,
+        "wires": [
+            [
+                "472fac13.c5fdf4"
+            ]
+        ]
+    },
+    {
+        "id": "3edb6486.7bbf6c",
+        "type": "ui_switch",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "label": "Store Topic",
+        "tooltip": "",
+        "group": "8130ac76.081eb8",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "STORE-TOPIC",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": true,
+        "className": "",
+        "x": 610,
+        "y": 620,
+        "wires": [
+            [
+                "472fac13.c5fdf4"
+            ]
+        ]
+    },
+    {
+        "id": "472fac13.c5fdf4",
+        "type": "function",
+        "z": "9a53bb39f51341d0",
+        "name": "Set Switches",
+        "func": "var local=flow.get('local') || {};\nvar topic=msg.topic;\nvar msg1={};\nvar msg2={};\nmsg2.payload=\"\";\nvar by_topic=local[\"by_topic\"]|| false; // log by topic\nvar all_data=local[\"all_data\"] || true; // log all data or only changed data\nvar store_time=local[\"store_time\"] ||false;\nvar store_topic=local[\"store_topic\"] ||false;\nvar start_logger=local[\"start_logger\"] || false;\nvar ignore_switches=local['ignore-switches'] || false;\npayload=msg.payload;\nnode.log(\"in switch status\");\n\nfunction reset()\n{\nlocal={};\nlocal[\"all_data\"]=true\n local[\"by_topic\"]=false;   \n local[\"store_topic\"]=false; \n local[\"all_data\"]=true;\n local[\"store_time\"]=false;  \n local['ignore-switches']=false;\n local[\"start_logger\"]=false;\n \n}\n\tif (topic==\"RESET\")\n\t{\n\t    reset(); //reset stored data to default\n\t    flow.set('local',local);\n\t    msg2.payload=\"Manual Reset\";\n\t    node.log(\"start_logger is \"+local[\"start_logger\"]);\n\t    msg1.payload=\"Logging Stopped\";\n\t    return[msg1,msg2];\n\t    \n\t}\n\n\tif (topic==\"START\")\n\t{\n\t\tif (payload){\n\t\t\tnode.log(\"start_logger \");\n\t\t\tlocal[\"start_logger\"]=payload;\n\t\t\tlocal['ignore-switches']=true;\n\t\t\tflow.set('local',local);\n\t\t\tnode.log(\"start_logger \"+local.start_logger)\n\t\t\tmsg1.payload=\"Logging started\";\n\t\t\t\n\t\t\treturn [msg1,msg2];\n\t\t}\n\telse\n\t{\n\t\t\tmsg1.payload=\"Logging Stopped\";\n\t\t\tlocal[\"start_logger\"]=false;\n\t\t\treset(); //reset stored data to default\n\t\t\tflow.set('local',local);\n\t\t\tmsg2.payload=false //reset switches\n\t\t\treturn [msg1,msg2];\n\t}\n\t}\n\t\t\n\tif (topic==\"BY-TOPIC\" && !ignore_switches)\n\t{\n\t\tif (payload)\n\t\t{\n\t\t  local[\"by_topic\"]=true;\n\t\t  flow.set('local',local);\n\t\t  return [null,msg2];\n\t\t}\n\t\telse\n\t\t{\n\t\t  local[\"by_topic\"]=false;\n\t\t  flow.set('local',local);\n\t\t  return [null,msg2];\n\t\t}\t\n\t}\n\tif (topic==\"ALL-DATA\" && !ignore_switches)\n\t{\n\t\tif (payload)\n\t\t{\n\n\t\t  local[\"all_data\"]=true;\n\t\t  flow.set('local',local);\n\t\t  return [null,msg2];\n\t\t}\n\t\telse\n\t\t{\n\n\t\t  local[\"all_data\"]=false;\n\t\t  flow.set('local',local);\n\t\t  return [null,msg2];\n\t\t}\n\t}\n\tif (topic==\"STORE-TOPIC\" && !ignore_switches)\n\t{\n\t\tif (payload)\n\t\t{\n\t\t  local[\"store_topic\"]=true;\n\t\t  flow.set('local',local);\n\t\t return [null,msg2];\n\t\t}\n\telse\n\t\t{\n\t\t  local[\"store_topic\"]=false;\n\t\t  flow.set('local',local);\n\t\t  return [null,msg2];\n\t\t}\n\t}\n\t\n\tif (topic==\"STORE-TIME\" && !ignore_switches)\n\t{\n\t\tif (payload)\n\t\t{\n\t\t  local[\"store_time\"]=true;\n\t\t  flow.set('local',local);\n\t\t return [null,msg2];\n\t\t}\n\telse\n\t\t{\n\t\t  local[\"store_time\"]=false;\n\t\t  flow.set('local',local);\n\t\t return [null,msg2];\n\t\t}\n\t}\t\t\n\n\n\n\n",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 460,
+        "wires": [
+            [
+                "8782b6a7.1a55c8"
+            ],
+            [
+                "8d67271c.e0f018"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "9c961d31.c2abc",
+        "type": "ui_button",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "group": "8130ac76.081eb8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "label": "RESET",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "topic": "RESET",
+        "topicType": "str",
+        "x": 380,
+        "y": 460,
+        "wires": [
+            [
+                "472fac13.c5fdf4",
+                "c91ec1e4.d4872",
+                "81ef6686.e3d91",
+                "d2f09f24.3f417"
+            ]
+        ]
+    },
+    {
+        "id": "8d67271c.e0f018",
+        "type": "ui_text",
+        "z": "9a53bb39f51341d0",
+        "group": "7efb4fcd.d113d8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Status",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1050,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "6706c6f9.fdcd58",
+        "type": "debug",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "df031aa.192a1e8",
+        "type": "debug",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 390,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "d2f09f24.3f417",
+        "type": "change",
+        "z": "9a53bb39f51341d0",
+        "name": "reset true",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 540,
+        "wires": [
+            [
+                "3edb6486.7bbf6c",
+                "bf38020c.9d21a",
+                "43ef5b8a.490874"
+            ]
+        ]
+    },
+    {
+        "id": "12eb0ee5.5d7261",
+        "type": "inject",
+        "z": "9a53bb39f51341d0",
+        "name": "Start",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "true",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 130,
+        "y": 360,
+        "wires": [
+            [
+                "c91ec1e4.d4872"
+            ]
+        ]
+    },
+    {
+        "id": "f800b1b2.09f98",
+        "type": "delay",
+        "z": "9a53bb39f51341d0",
+        "name": "variable delay",
+        "pauseType": "delayv",
+        "timeout": "5",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 500,
+        "y": 880,
+        "wires": [
+            [
+                "140dd7f1.c10538",
+                "22a0d2c.11e072e",
+                "7af25090.3a84c"
+            ]
+        ]
+    },
+    {
+        "id": "140dd7f1.c10538",
+        "type": "function",
+        "z": "9a53bb39f51341d0",
+        "name": "readline loop",
+        "func": "// Loop function\n// Top output provides triger for next actions\n// Botton output should be connected to the input through a dealy\n// The msg.payload can consis one of actions: start, stop, toggle\n// Other content is ignored\n// On the outoput the msg.payload contains current loop state\nvar lineByLine = global.get('lineByLine');\nlet Lines =context.get(\"Lines\");\n\nlet lineNumber = context.get(\"lineNumber\");\nlet line;\n\nvar delay;\nvar prevtime;\n\nif (typeof lineNumber==\"undefined\")\n     lineNumber = 1;\n\ncontext.loop = context.loop || \"stop\";\ncontext.loops = context.loops || 0;\n\nswitch (msg.trigger) {\n\tcase \"stop\":\n\t\tcontext.loops = context.loops + 1;\n\t\tmsg.trigger = \"stopped\";\n\t\tcontext.loop = \"stop\";\n\t\tmsg.delay = 0;\n\t\treturn msg;\n\tcase \"toggle\":\n\t\tif (context.loop == \"loop\") {\n\t\t\tmsg.trigger = \"stopped\";\n\t\t\tcontext.loop = \"stop\";\n\t\t\tmsg.delay = 500;\n    \t\treturn msg;\n\t\t} else {\n\t\t\tmsg.trigger = \"started\";\n\t\t\tcontext.loop = \"loop\";\n\t\t\tcontext.loops = 1;\n\t\t\tmsg.delay = 500;\n    \t\treturn msg;\n\t\t} break;\n\tcase \"start\":\n        Lines = new lineByLine('/home/david/Integrants/default/log000.txt');\n        context.set(\"Lines\", Lines);\n        context.set(\"lineNumber\", 1);\n        msg.payload = Lines.next()\n\t\tmsg.trigger = \"started\";\n\t\tcontext.loop = \"loop\";\n\t\tcontext.loops = 1;\n\t\tmsg.delay = 500;\n        return msg;\n\n\tdefault:\n\t\tif (context.loop == \"loop\") {\n            line = Lines.next()\n            msg.line = JSON.parse(line.toString('ascii'));\n            msg.topic = msg.line.topic;\n            msg.payload = msg.line.payload;\n\n            delay = msg.line.time-msg.prevtime;            \n            if(delay != delay) delay = 0;\n            msg.delay = delay;\n            msg.prevtime = msg.line.time;\n            if(line)\n            {\n                lineNumber++;\n                msg.linenumber= lineNumber;\n            }\n            else\n            {\n                msg.trigger = \"stop\";\n            }\n\n            context.set(\"lineNumber\",lineNumber);\n\t\t\tcontext.loops = context.loops + 1;\n\t\t\tvar loopNo = context.loops;\n\t\t\t//msg.payload = \"loop:\" + context.loops;\n\t\t\t//msg.delay = 500; //loopNo * 300;\n\t\t\tmsg.loop = loopNo;\n            return msg;\n\t\t} else {\n\t\t\treturn null; \n\t\t}\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "var lineByLine = global.get('lineByLine');\n// Code added here will be run once\n// whenever the node is started.\nvar Lines = new lineByLine('/home/david/Integrants/test.csv');\ncontext.set(\"Lines\",Lines);\ncontext.set(\"lineNumber\",1);\n",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 780,
+        "wires": [
+            [
+                "7ce9c77.7e6fd38",
+                "f800b1b2.09f98"
+            ]
+        ]
+    },
+    {
+        "id": "caa7ccf4.fb4e3",
+        "type": "inject",
+        "z": "9a53bb39f51341d0",
+        "name": "toggle loop 1",
+        "props": [
+            {
+                "p": "trigger",
+                "v": "toggle",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "x": 150,
+        "y": 820,
+        "wires": [
+            [
+                "140dd7f1.c10538"
+            ]
+        ]
+    },
+    {
+        "id": "7ce9c77.7e6fd38",
+        "type": "debug",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "22a0d2c.11e072e",
+        "type": "debug",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "7af25090.3a84c",
+        "type": "mqtt out",
+        "z": "9a53bb39f51341d0",
+        "name": "",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "8d987c68b143b2a4",
+        "x": 1030,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "6afec280.ef715c",
+        "type": "inject",
+        "z": "9a53bb39f51341d0",
+        "name": "start loop 1",
+        "props": [
+            {
+                "p": "trigger",
+                "v": "start",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payloadType": "str",
+        "x": 140,
+        "y": 780,
+        "wires": [
+            [
+                "140dd7f1.c10538"
+            ]
+        ]
+    },
+    {
+        "id": "90fe061c.ea24f8",
+        "type": "inject",
+        "z": "9a53bb39f51341d0",
+        "name": "stop loop 1",
+        "props": [
+            {
+                "p": "trigger",
+                "v": "stop",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "x": 140,
+        "y": 860,
+        "wires": [
+            [
+                "140dd7f1.c10538"
+            ]
+        ]
+    },
+    {
+        "id": "8d987c68b143b2a4",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "5",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "8130ac76.081eb8",
+        "type": "ui_group",
+        "name": "Control",
+        "tab": "3d343106.1cdade",
+        "order": 1,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "7efb4fcd.d113d8",
+        "type": "ui_group",
+        "name": "Status",
+        "tab": "3d343106.1cdade",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "3d343106.1cdade",
+        "type": "ui_tab",
+        "name": "Logger",
+        "icon": "dashboard"
+    }
+]

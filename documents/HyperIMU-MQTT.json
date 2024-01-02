@@ -1,0 +1,317 @@
+[
+    {
+        "id": "c3a3ac26.adb5f",
+        "type": "tcp in",
+        "z": "4dc50063.b2168",
+        "name": "HyperIMU",
+        "server": "server",
+        "host": "",
+        "port": "2055",
+        "datamode": "stream",
+        "datatype": "utf8",
+        "newline": "",
+        "topic": "HyperIMU",
+        "base64": false,
+        "x": 100,
+        "y": 2080,
+        "wires": [
+            [
+                "ac0464d.9bff398",
+                "c01ee180.d945d"
+            ]
+        ]
+    },
+    {
+        "id": "ac0464d.9bff398",
+        "type": "json",
+        "z": "4dc50063.b2168",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": true,
+        "x": 270,
+        "y": 2080,
+        "wires": [
+            [
+                "ec497091.1b5f",
+                "a78d754c.65fde8"
+            ]
+        ]
+    },
+    {
+        "id": "8b19c1fa.8265d",
+        "type": "mqtt out",
+        "z": "4dc50063.b2168",
+        "name": "",
+        "topic": "integrants/sub/HyperIMU",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "8d987c68b143b2a4",
+        "x": 930,
+        "y": 2080,
+        "wires": []
+    },
+    {
+        "id": "ec497091.1b5f",
+        "type": "debug",
+        "z": "4dc50063.b2168",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 2140,
+        "wires": []
+    },
+    {
+        "id": "c01ee180.d945d",
+        "type": "debug",
+        "z": "4dc50063.b2168",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 210,
+        "y": 2140,
+        "wires": []
+    },
+    {
+        "id": "a78d754c.65fde8",
+        "type": "change",
+        "z": "4dc50063.b2168",
+        "name": "",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload[\"orientation sensor\"]",
+                "pt": "msg",
+                "to": "payload.SensorAngles",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 2080,
+        "wires": [
+            [
+                "fc15717.bf4119",
+                "8b19c1fa.8265d"
+            ]
+        ]
+    },
+    {
+        "id": "fc15717.bf4119",
+        "type": "debug",
+        "z": "4dc50063.b2168",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 730,
+        "y": 2140,
+        "wires": []
+    },
+    {
+        "id": "aa8646a1.70dde8",
+        "type": "ui_gauge",
+        "z": "4dc50063.b2168",
+        "name": "Heading",
+        "group": "9410f7f0.8d6538",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "compass",
+        "title": "Heading",
+        "label": "&deg",
+        "format": "{{msg.payload[\"SensorAngles\"][0] | number:1}}",
+        "min": 0,
+        "max": "360",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 960,
+        "y": 2240,
+        "wires": []
+    },
+    {
+        "id": "270f3909.2a1126",
+        "type": "ui_gauge",
+        "z": "4dc50063.b2168",
+        "name": "Pitch",
+        "group": "9410f7f0.8d6538",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Pitch",
+        "label": "&deg",
+        "format": "{{msg.payload[\"SensorAngles\"][1] | number:1}}",
+        "min": "180",
+        "max": "-180",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 950,
+        "y": 2280,
+        "wires": []
+    },
+    {
+        "id": "3aafe56f.13082a",
+        "type": "ui_gauge",
+        "z": "4dc50063.b2168",
+        "name": "Roll",
+        "group": "9410f7f0.8d6538",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Roll",
+        "label": "&deg",
+        "format": "{{msg.payload[\"SensorAngles\"][2] | number:1}}",
+        "min": "180",
+        "max": "-180",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 950,
+        "y": 2320,
+        "wires": []
+    },
+    {
+        "id": "10eacc1b.835274",
+        "type": "debug",
+        "z": "4dc50063.b2168",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 2300,
+        "wires": []
+    },
+    {
+        "id": "d97873e6.a126f",
+        "type": "json",
+        "z": "4dc50063.b2168",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 470,
+        "y": 2240,
+        "wires": [
+            [
+                "aa8646a1.70dde8",
+                "270f3909.2a1126",
+                "3aafe56f.13082a",
+                "10eacc1b.835274"
+            ]
+        ]
+    },
+    {
+        "id": "fd53e253.f7f5",
+        "type": "mqtt in",
+        "z": "4dc50063.b2168",
+        "name": "",
+        "topic": "integrants/sub/HyperIMU/#",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "8d987c68b143b2a4",
+        "nl": false,
+        "rap": false,
+        "x": 150,
+        "y": 2240,
+        "wires": [
+            [
+                "d97873e6.a126f"
+            ]
+        ]
+    },
+    {
+        "id": "8d987c68b143b2a4",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "5",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "9410f7f0.8d6538",
+        "type": "ui_group",
+        "name": "HyperIMU",
+        "tab": "bbdfe1e0.8bd21",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "bbdfe1e0.8bd21",
+        "type": "ui_tab",
+        "name": "Integrants",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
