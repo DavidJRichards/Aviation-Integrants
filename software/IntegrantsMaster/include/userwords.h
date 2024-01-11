@@ -236,17 +236,20 @@ void looptft(void) {
   }
 }
 
+extern void set_menuindex(int idx, float value);
 extern float get_menuindex(int idx);
 extern int values[16];
 extern float fvalues[16];
 #include "src_menu.h"
 extern int encoder_pos;
-
+extern void CALLBACK_FUNCTION eeprom_load(int id);
+//   Y(eepromload, menuMgr.load();) \
 
 #define USER_WORDS \
   Y(encoder, DUP; tos = (cell_t) & encoder_pos) \
-  Y(eepromload, menuMgr.load();) \
-  Y(menuidx, *++fp = get_menuindex(n0); DROP) \
+  Y(eepromload, eeprom_load(0);) \
+  Y(getmenuidx, *++fp = get_menuindex(n0); DROP) \
+  Y(putmenuidx, set_menuindex(n0, *fp--); DROP) \
   Y(putvalue, values[n0]=n1; DROPn(2)) \
   Y(getvalue, n0=values[n0];) \
   Y(fgetvalue, *++fp = fvalues[n0]; DROP) \

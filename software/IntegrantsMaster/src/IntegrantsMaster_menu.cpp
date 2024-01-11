@@ -2150,8 +2150,8 @@ const PROGMEM AnalogMenuInfo minfoMAPFine = { "MAP_Fine", 129, 252, 3600, cb_fin
 AnalogMenuItem menuMAPFine(&minfoMAPFine, 0, &menuMapFine, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoMapAbsolute = { "MAP_Absolute", 112, 180, 0, cb_absolute };
 EditableLargeNumberMenuItem menuMapAbsolute(&minfoMapAbsolute, LargeFixedNumber(7, 1, 0U, 0U, false), false, &menuMAPFine, INFO_LOCATION_PGM);
-const PROGMEM AnalogMenuInfo minfoMapHeading = { "Map_Heading", 127, 246, 3600, cb_heading, 0, 10, "" };
-AnalogMenuItem menuMapHeading(&minfoMapHeading, 900, &menuMapAbsolute, INFO_LOCATION_PGM);
+const PROGMEM AnalogMenuInfo minfoMapHeading = { "Map_Heading", 127, 246, 7200, cb_heading, -3600, 10, "" };
+AnalogMenuItem menuMapHeading(&minfoMapHeading, 3600, &menuMapAbsolute, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoMapNtoS = { "Map_NtoS", 128, 242, 1800, cb_ntos, -900, 10, "" };
 AnalogMenuItem menuMapNtoS(&minfoMapNtoS, 900, &menuMapHeading, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoMapPosition = { "Map_Position", 126, 238, 19000, cb_position, 0, 1, "0" };

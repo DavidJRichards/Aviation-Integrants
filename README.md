@@ -57,6 +57,8 @@ Client using RP2040 PWM generators
 
 ## [Documents](./documents)
 
+[Node-Red MQTT](./documents/node-red-mqtt.md)
+
 ## Driver modules
 
 ### PWM

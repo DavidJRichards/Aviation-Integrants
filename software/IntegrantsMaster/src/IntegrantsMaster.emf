@@ -99,10 +99,10 @@
     {
       "parentId": 134,
       "type": "analogItem",
-      "defaultValue": "900",
+      "defaultValue": "3600",
       "item": {
-        "maxValue": 3600,
-        "offset": 0,
+        "maxValue": 7200,
+        "offset": -3600,
         "divisor": 10,
         "unitName": "",
         "step": 1,

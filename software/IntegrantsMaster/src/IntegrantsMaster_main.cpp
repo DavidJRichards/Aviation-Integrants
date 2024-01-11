@@ -469,7 +469,7 @@ void mqtt_publish()
     menuMAPFine.getCurrentValue() / 10.0,
     menuMAPMedium.getCurrentValue() / 10.0,
     menuMAPCoarse.getCurrentValue() / 10.0,
-    menuMapHeading.getCurrentValue() / 10.0,
+    fmod((menuMapHeading.getCurrentValue() / 10.0),360.0),
     menuMapNtoS.getCurrentValue() / 10.0
   );
   mqttClient.publish("integrants/pub/MAPstatus", buf, strlen(buf), 2);
@@ -689,6 +689,36 @@ void requestData() {
   MAP_NtoS
  };
 
+enum menu_source {
+ 
+  Wdefault=0,   // 0
+  Wencoder,     // 1
+
+  Wabsolute,    // 2
+  Wfine,        // 3
+  Wmedium,      // 4
+  Wcoarse,      // 5
+
+  Wheading,     // 6
+  Wntos,        // 7
+
+  Wpitch,       // 8
+  Wroll,        // 9
+  Wcompass,     // 10
+
+  Value0,
+  Value1,
+  Value2,
+  Value3, 
+  Value4,
+  Value5,
+  Value6,
+  Value7, 
+  Value8,
+  Value9,
+  Value10,
+  Value11,
+};
 
 // use source index from destination menu
 // to lookup appropriate source value
@@ -919,7 +949,8 @@ float get_menuindex(int idx)
         break;
 
       case MAP_Heading:
-        value = menuMapHeading.getCurrentValue() / 10.0;
+        // apply moving map 90 degree heading offset
+        value = 90.0 + menuMapHeading.getCurrentValue() / 10.0;
          break;
 
       case MAP_NtoS:
@@ -930,6 +961,90 @@ float get_menuindex(int idx)
     }
     return value;
 }
+
+void set_menuindex(int idx, float value)
+{   
+  switch(idx)
+  {
+    case Wencoder:
+      encoder_pos = value;
+      break;
+
+    case Wabsolute:
+
+      absolute = value;
+      menuMapAbsolute.getLargeNumber()->setFromFloat(absolute);
+      menuMapPosition.setCurrentValue(absolute/10.0); 
+      abs2res(absolute);
+      break;
+    case Wfine:
+      menuMAPFine.setCurrentValue  (10.0 * value); // fine
+      break;
+    case Wmedium:
+      menuMAPFine.setCurrentValue  (10.0 * value);
+      break;
+    case Wcoarse:
+      menuMAPFine.setCurrentValue  (10.0 * value);
+      break;
+
+    case Wheading:
+      menuMapHeading.setCurrentValue  (10.0 * fmod(value+360,360.0));
+      break;
+    case Wntos:
+      menuMapNtoS.setCurrentValue  (10.0 * value);
+      break;
+
+    case Wpitch:
+       pitch = value;
+      break;
+    case Wroll:
+      roll = value;
+      break;
+    case Wcompass:
+       compass = value;
+      break;
+
+    case Value0:
+      values[0] = value;
+      break;
+    case Value1:
+      values[1] = value;
+      break;
+    case Value2:
+      values[2] = value;
+      break;
+    case Value3:
+      values[3] = value;
+      break;
+    case Value4:
+      values[4] = value;
+      break;
+    case Value5:
+      values[5] = value;
+      break;
+    case Value6:
+      values[6] = value;
+      break;
+    case Value7:
+      values[7] = value;
+      break;
+    case Value8:
+      values[8] = value;
+      break;
+    case Value9:
+      values[9] = value;
+      break;
+    case Value10:
+      values[10] = value;
+      break;
+    case Value11:
+      values[11] = value;
+      break;
+    case Default:
+    break;
+  }
+}
+
 
 void update_pwm_angles(void) {
   txData.channels[0].value=get_menuindex(menuPWMChan0.getCurrentValue() );
@@ -955,7 +1070,7 @@ void loop() {
 
   if (target1_time < millis() ) 
   {
-    target1_time += 500;
+    target1_time += 100;
 
 #ifdef USE_SPI_MDAC
     newDACdata = true;  // forces re-send SPI data if unchanged
@@ -1122,6 +1237,12 @@ void abs2res(double abs)
 
 void CALLBACK_FUNCTION eeprom_load(int id) {
   menuMgr.load();
+  // dont know why this is needed ...
+  //absolute=menuMapAbsolute.getLargeNumber()->getAsFloat();
+  absolute = 10.0 * menuMapPosition.getCurrentValue();
+  menuMapPosition.setCurrentValue(absolute/10.0); 
+  abs2res(absolute); // also sets newTxData
+
 }
 
 
