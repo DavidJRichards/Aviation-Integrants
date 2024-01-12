@@ -681,7 +681,8 @@ void requestData() {
   EEP_Angle3,
   EEP_Angle4,
   EEP_Angle5,
-  MAP_Position,
+//  MAP_Position,
+  MAP_Absolute,
   MAP_Coarse,
   MAP_Medium,
   MAP_Fine,
@@ -944,8 +945,11 @@ float get_menuindex(int idx)
         value = menuMAPFine.getCurrentValue() / 10.0;
         break;
 
-      case MAP_Position:
-        value = 10.0 * menuMapPosition.getCurrentValue();
+//      case MAP_Position:
+//        value = 10.0 * menuMapPosition.getCurrentValue();
+//        break;
+      case MAP_Absolute:
+        value = absolute;
         break;
 
       case MAP_Heading:
@@ -971,10 +975,9 @@ void set_menuindex(int idx, float value)
       break;
 
     case Wabsolute:
-
       absolute = value;
+//      menuMapPosition.setCurrentValue(absolute/10.0); 
       menuMapAbsolute.getLargeNumber()->setFromFloat(absolute);
-      menuMapPosition.setCurrentValue(absolute/10.0); 
       abs2res(absolute);
       break;
     case Wfine:
@@ -1239,8 +1242,9 @@ void CALLBACK_FUNCTION eeprom_load(int id) {
   menuMgr.load();
   // dont know why this is needed ...
   //absolute=menuMapAbsolute.getLargeNumber()->getAsFloat();
-  absolute = 10.0 * menuMapPosition.getCurrentValue();
-  menuMapPosition.setCurrentValue(absolute/10.0); 
+  //absolute = 10.0 * menuMapPosition.getCurrentValue();
+  absolute=menuMapAbsolute.getLargeNumber()->getAsFloat();
+  //menuMapPosition.setCurrentValue(absolute/10.0); 
   abs2res(absolute); // also sets newTxData
 
 }
@@ -1268,7 +1272,7 @@ void CALLBACK_FUNCTION cb_ratio(int id) {
 
 void CALLBACK_FUNCTION cb_position(int id) {
   absolute = 10.0 * menuMapPosition.getCurrentValue();
-  menuMapAbsolute.getLargeNumber()->setFromFloat(absolute);
+  //menuMapAbsolute.getLargeNumber()->setFromFloat(absolute);
   abs2res(absolute); // also sets newTxData
 }
 

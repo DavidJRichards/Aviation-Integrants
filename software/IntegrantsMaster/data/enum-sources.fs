@@ -55,7 +55,7 @@ source  EEP_Angle2
 source  EEP_Angle3
 source  EEP_Angle4
 source  EEP_Angle5
-source  MAP_Position
+source  MAP_Absolute
 source  MAP_Coarse
 source  MAP_Medium
 source  MAP_Fine
