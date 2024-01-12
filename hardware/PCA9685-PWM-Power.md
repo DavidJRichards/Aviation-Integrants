@@ -25,7 +25,7 @@ An additional switching power supply board takes the 26 DC volt system power and
 
 
 |Channel|Sink         |               |    | |
-|       |-------------|---------------|----|-|
+|-------|-------------|---------------|----|-|
 |    0  |DAC Galv Bias|5 volt analogue|5pin|HSI|
 |    1  |DAC Galv1    |250 uA Analogue|5pin|HSI|
 |    2  |DAC Galv2    |250 uA Analogue|5pin|HSI|
